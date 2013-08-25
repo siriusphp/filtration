@@ -100,7 +100,14 @@ class Filtrator {
         return $value; 
     }
 
-    protected function applyFilters($item, $value) {
+    /**
+     * Apply filters to a single value
+     * 
+     * @param  string $item  array element path (eg: 'key' or 'key[0][subkey]')
+     * @param  mixed $value value of the item
+     * @return mixed
+     */
+    function applyFilters($item, $value) {
         foreach ($this->filters as $selector => $filters) {
             if ($this->itemMatchesSelector($item, $selector)) {
                 foreach ($filters as $filter) {
