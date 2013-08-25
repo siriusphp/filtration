@@ -1,0 +1,4 @@
+SiriusFiltration
+================
+
+Array filtering/sanitization
