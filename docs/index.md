@@ -25,7 +25,7 @@ $filteredPostData = $filtrator->filter($_POST);
 The `$callback` parameter can be any callable entity: a PHP function, a static method class etc. 
 The only things to keep in mind are:
 
-1. The first argument must be the value you want filtered. `trim`, 'strtolower', 'ucwords' are good candidates, but not `str_replace`.
+1. The first argument must be the value you want filtered. `trim`, `strtolower`, `ucwords` are good candidates, but not `str_replace`.
 2. The parameters passed to the callback will be added one after the other
 
 ```php
@@ -58,7 +58,7 @@ Sometimes you may need to filter a single value. For example, you may have a fil
 ```php
 $filteredValue = $filtrator->applyFilters('key[subkey]', $_POST['key']['subkey']);
 ```
-The code above will apply all the filters associated with the selector that match the `key[subkey]` ('key[*]` or `*[*]` but not `*`) to the value passed as the second parameter.
+The code above will apply all the filters associated with the selector that match the `key[subkey]` (`key[*]` or `*[*]` but not `*`) to the value passed as the second parameter.
 
 Get the list of your filters
 =====
