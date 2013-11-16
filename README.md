@@ -7,7 +7,7 @@ Sometimes you want to make sure the values pushed by a source (eg: a user when s
 - no space at the beginning or the end for the title of a page
 - no HTML code in a comment sent by a user
 - no spaces in the field which represents the URL
-- check for XSS
+- remove XSS attacks
 - etc...
 
 Other times you want to make sure that the data you send to the user is parsed before displaying. For example you may want to:

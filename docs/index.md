@@ -1,5 +1,4 @@
-How to use SiriusFiltration
-======
+# How to use SiriusFiltration
 
 ```php
 require_once ('path/to/siriusfiltration/autoload.php');
@@ -7,22 +6,21 @@ require_once ('path/to/siriusfiltration/autoload.php');
 $filtrator = new Sirius\Filtration\Filtrator;
 
 // syntax for adding filters
-$filtrator->add($selector, $callback, $parametersForTheCallback = null, $priority = 0, $recursive = false);
+$filtrator->add($selector, $callback, $parametersForTheCallback = null, $recursive = false, $priority = 0);
 
+// strip all but the P, DIV and BR tags from the content
+$filtrator->add('content', 'strip_tags', array('<p><div><br><br/>'));
 
 // trim all the elements of the array, only on the first level
 $filtrator->add('*', 'trim');
 
 // trim all the elements of the array, recursively
-$filtrator->add('*', 'trim', null, 0, true);
-
-// strip all but the P, DIV and BR tags from the content
-$filtrator->add('content', 'strip_tags', array('<p><div><br><br/>'));
+$filtrator->add('*', 'trim', null, true);
 
 $filteredPostData = $filtrator->filter($_POST);
 ```
 
-The `$callback` parameter can be any callable entity: a PHP function, a static method class etc. 
+The `$callback` parameter can be anything that is callable: a PHP function, a static method class, an invokable object etc. 
 The only things to keep in mind are:
 
 1. The first argument must be the value you want filtered. `trim`, `strtolower`, `ucwords` are good candidates, but not `str_replace`.
@@ -36,8 +34,7 @@ function myFilter($value, $arg1, $arg2, $arg3) {
 $filtrator->add('selector', 'myFilter', array(1, 2, 3));
 ```
 
-Removing filters
-=====
+## Removing filters
 
 Sometimes you may want to remove filters (if your app uses events to alter its functionality).
 You can do that like this:
@@ -50,8 +47,31 @@ $filtrator->remove('*', 'trim');
 $filtrator->remove('*', true);
 ```
 
-Filtering only one array element
-=====
+## Transforming data
+
+Sometimes the data provided may come in "wrong" shape. For example a date field may be set in $_POST as an array on a different key but you only need a regular string to manipulate.
+For this situations you need to transform the data, not filter it.
+
+```php
+$data = array(
+    'date_as_array' => array(
+        'year' => 2012,
+        'month' => 1,
+    	'day' => 12
+    )
+);
+function convertDateArraysToString ($data, $source, $destination) {
+	$data[$destination] = sprintf('%s-%s-%s, $data[$source]['year'], $data[$source]['month'], $data[$source]['day']);
+	// make sure you return the data back
+	return $data;
+}
+
+$filtrator->add(Filtrator::SELECTOR_ROOT, 'convertDateArraysToString', array('date_as_array', 'date')); 
+$data = $filtrator->filter($data);
+$data['date'] == '2012-1-12'; // true
+```
+
+## Filtering only one array element
 
 Sometimes you may need to filter a single value. For example, you may have a filtrator object that you use for a form but you use AJAX to send a single value to the server; you still need to filter the value but you don't want to repeat yourself
 
@@ -60,8 +80,7 @@ $filteredValue = $filtrator->applyFilters('key[subkey]', $_POST['key']['subkey']
 ```
 The code above will apply all the filters associated with the selector that match the `key[subkey]` (`key[*]` or `*[*]` but not `*`) to the value passed as the second parameter.
 
-Get the list of your filters
-=====
+## Get the list of your filters
 
 You may need to retrieve the list of filters for various reasons (eg: you need to converted into a list of javascript filters for the client side)
 ```php
@@ -78,8 +97,7 @@ array(
 );
 ```
 
-Caveats
-=====
+## Caveats
 
 1. You cannot filter single values... easily.
 

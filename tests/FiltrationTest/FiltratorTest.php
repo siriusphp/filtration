@@ -28,6 +28,15 @@ class FiltratorTest extends \PHPUnit_Framework_TestCase  {
         );
     }
 
+    function testRootFilters() {
+    	$this->filtrator->add('/', function($value) {
+        	$value['text'] = trim(strip_tags($value['html']));
+        	return $value;
+    	});
+    	$filtered = $this->filtrator->filter($this->data);
+    	$this->assertEquals('html', $filtered['text']);
+    }
+    
     function testSelectorPath() {
         $this->filtrator->add('array[whitespace]', 'trim');
         $filtered = $this->filtrator->filter($this->data);
