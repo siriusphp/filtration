@@ -58,7 +58,7 @@ class Filtrator {
 	 * @throws \InvalidArgumentException
 	 * @return \Sirius\Filtration\Filtrator
 	 */
-	function add($selector, $callback, $params = array(), $recursive = false, $priority = 0) {
+	function add($selector, $callbackOrName, $options = array(), $recursive = false, $priority = 0) {
         if (!is_callable($callback)) {
             throw new \InvalidArgumentException('The filter is not callable');
         }
@@ -81,10 +81,10 @@ class Filtrator {
 	 * Remove a filter from the stack 
 	 * 
 	 * @param string $selector
-	 * @param callable|true $callback
+	 * @param callable|true $callbackOrName
 	 * @return \Sirius\Filtration\Filtrator
 	 */
-	function remove($selector, $callback = true) {
+	function remove($selector, $callbackOrName = true) {
         if (array_key_exists($selector, $this->filters)) {
             if ($callback === true) {
                 unset($this->filters[$selector]);
