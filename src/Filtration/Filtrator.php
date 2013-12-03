@@ -1,96 +1,162 @@
 <?php
-
 namespace Sirius\Filtration;
 
 use Sirius\Filtration\Utils;
 
-class Filtrator {
-	// selector to specify that the filter is applied to the entire data set
-	const SELECTOR_ROOT = '/';
-	
-	// selector to specify that the filter is applied to all ITEMS of a set
-	const SELECTOR_ANY = '*';
-	
-	/**
-	 * The list of filters available in the filtrator
-	 * 
-	 * @var array
-	 */
-	protected $filters = array();
+class Filtrator
+{
+    // selector to specify that the filter is applied to the entire data set
+    const SELECTOR_ROOT = '/';
+    
+    // selector to specify that the filter is applied to all ITEMS of a set
+    const SELECTOR_ANY = '*';
 
-	function __construct($filters = array()) {
+    /**
+     * The list of filters available in the filtrator
+     *
+     * @var array
+     */
+    protected $filters = array();
 
-	}
+    function __construct($filters = array())
+    {}
 
     /**
      * Get a valid priority number to attach to a filter
-     * 
-     * @param string $selector
-     * @param int $desiredPriority
+     *
+     * @param string $selector            
+     * @param int $desiredPriority            
      * @return number
      */
-    protected function getValidPriority($selector, $desiredPriority) {
+    protected function getValidPriority($selector, $desiredPriority)
+    {
         // make sure the priority is an integer so we don't screw up the math
         // also multiply everything by 10000 because the priority must be an integer
         // as it will be used as the $filters[$selector] array key
         $desiredPriority = (int) $desiredPriority * 10000;
-        if (!array_key_exists($selector, $this->filters)) {
+        if (! array_key_exists($selector, $this->filters)) {
             return $desiredPriority;
         }
         // the increment will be used to determine when we find an available spot
-        // obviously if you have 10000 filters with priority 0, 
+        // obviously if you have 10000 filters with priority 0,
         // the 10000th will get to priority one but that's a chance we are willing to take
-        $increment = 1; 
+        $increment = 1;
         while (array_key_exists($desiredPriority, $this->filters[$selector])) {
             $desiredPriority += $increment;
         }
         return $desiredPriority;
     }
 
-	/**
-	 * Add a filter to the list of stack
-	 * 
-	 * @param string $selector
-	 * @param callable $callback
-	 * @param array $params
-	 * @param bool $recursive
-	 * @param number $priority
-	 * @throws \InvalidArgumentException
-	 * @return \Sirius\Filtration\Filtrator
-	 */
-	function add($selector, $callbackOrName, $options = array(), $recursive = false, $priority = 0) {
-        if (!is_callable($callback)) {
-            throw new \InvalidArgumentException('The filter is not callable');
-        }
-        if (!$this->has($selector, $callback)) {
+    /**
+     * Add a filter to the filters stack
+     *
+     * @example // normal callback
+     *          $filtrator->add('title', '\strip_tags');
+     *          // anonymous function
+     *          $filtrator->add('title', function($value){ return $value . '!!!'; });
+     *          // filter class from the library
+     *          $filtrator->add('title', 'normalizedate', array('format' => 'm/d/Y'));
+     *          // custom class
+     *          $filtrator->add('title', '\MyApp\Filters\CustomFilter');
+     * @param string $selector            
+     * @param
+     *            callable|filter class name|\Sirius\Filtration\Filter\AbstractFilter $callbackOrFilterName
+     * @param string|array $params            
+     * @param bool $recursive            
+     * @param number $priority            
+     * @return \Sirius\Filtration\Filtrator
+     */
+    function add($selector, $callbackOrFilterName, $options = null, $recursive = false, $priority = 0)
+    {
+        $filter = $this->createFilter($callbackOrFilterName, $options, $recursive);
+        if (! $this->has($selector, $filter)) {
             $priority = $this->getValidPriority($selector, $priority);
-            if (!array_key_exists($selector, $this->filters)) {
+            if (! array_key_exists($selector, $this->filters)) {
                 $this->filters[$selector] = array();
             }
-            $this->filters[$selector][$priority] = array(
-                'callback'  => $callback,
-                'params'    => is_array($params) ? $params : array(),
-                'recursive' => $recursive
-            );
+            $this->filters[$selector][$priority] = $filter;
             ksort($this->filters[$selector]);
         }
         return $this;
-	}
+    }
 
-	/**
-	 * Remove a filter from the stack 
-	 * 
-	 * @param string $selector
-	 * @param callable|true $callbackOrName
-	 * @return \Sirius\Filtration\Filtrator
-	 */
-	function remove($selector, $callbackOrName = true) {
+    /**
+     * Factory method to create a filter from various options
+     * 
+     * @param callable|class|filter $callbackOrFilterName            
+     * @param string|array $options            
+     * @param bool $resursive            
+     * @throws \InvalidArgumentException
+     * @return \Sirius\Filtration\Filter\AbstractFilter
+     */
+    protected function createFilter($callbackOrFilterName, $options = null, $resursive = false)
+    {
+        if ($options && is_string($options)) {
+            $startChar = substr($options, 0, 1);
+            if ($startChar == '{' || $startChar == '[') {
+                $options = json_decode($options, true);
+            } else {
+                parse_str($options, $output);
+                $options = $output;
+            }
+        } elseif (! $options) {
+            $options = array();
+        }
+        
+        if (! is_array($options)) {
+            throw new \InvalidArgumentException('Validator options should be an array, JSON string or query string');
+        }
+        
+        if (is_callable($callbackOrFilterName)) {
+            $filter = new \Sirius\Filtration\Filter\Callback(array(
+                'callback' => $callbackOrFilterName,
+                'arguments' => $options
+            ), $resursive);
+        } else 
+            if (is_string($callbackOrFilterName)) {
+                // use the validator map
+                if (isset($this->validatorsMap[strtolower($callbackOrFilterName)])) {
+                    $callbackOrFilterName = $this->validatorsMap[strtolower($callbackOrFilterName)];
+                }
+                if (class_exists('\Sirius\Filtration\Filter\\' . $callbackOrFilterName)) {
+                    $callbackOrFilterName = '\Sirius\Filtration\Filter\\' . $callbackOrFilterName;
+                }
+                echo $callbackOrFilterName;
+                if (class_exists($callbackOrFilterName) && is_subclass_of($callbackOrFilterName, '\Sirius\Filtration\Filter\AbstractFilter')) {
+                    $filter = new $callbackOrFilterName($options, $resursive);
+                } else {
+                    throw new \InvalidArgumentException(sprintf('Impossible to determine the filter based on the name %s', (string) $callbackOrFilterName));
+                }
+            } else 
+                if (is_object($callbackOrFilterName) && $callbackOrFilterName instanceof \Sirius\Filtration\Filter\AbstractFilter) {
+                    $filter = $callbackOrFilterName;
+                }
+        if (! isset($filter)) {
+            throw new \InvalidArgumentException('Invalid value for the $callbackorFilterName parameter');
+        }
+        return $filter;
+    }
+
+    /**
+     * Remove a filter from the stack
+     *
+     * @param string $selector            
+     * @param callable|classname|filter|TRUE $callbackOrName            
+     * @return \Sirius\Filtration\Filtrator
+     */
+    function remove($selector, $callbackOrName = true)
+    {
         if (array_key_exists($selector, $this->filters)) {
-            if ($callback === true) {
+            if ($callbackOrName === true) {
                 unset($this->filters[$selector]);
             } else {
-                foreach ($this->filters[$selector] as $priority => $filter) {
-                    if ($filter['callback'] === $callback) {
+                if (!is_object($callbackOrName)) {
+                    $filter = $this->createFilter($callbackOrName);
+                } else {
+                    $filter = $callbackOrName;
+                }
+                foreach ($this->filters[$selector] as $priority => $f) {
+                    if ($f->getUniqueId() === $filter->getUniqueId()) {
                         unset($this->filters[$selector][$priority]);
                         break;
                     }
@@ -98,50 +164,53 @@ class Filtrator {
             }
         }
         return $this;
-	}
+    }
 
-	/**
-	 * Check if a filter is in the stack
-	 * 
-	 * @param string $selector
-	 * @param callable $callback
-	 * @return boolean
-	 */
-	function has($selector, $callback) {
+    /**
+     * Check if a filter is in the stack
+     *
+     * @param string $selector            
+     * @param Sirius\Filtration\Filter\AbstractFilter $filter            
+     * @return boolean
+     */
+    function has($selector, $filter)
+    {
         if (array_key_exists($selector, $this->filters)) {
-            foreach ($this->filters[$selector] as $filter) {
-                if ($filter['callback'] === $callback) {
+            foreach ($this->filters[$selector] as $f) {
+                if ($f->getUniqueId() === $filter->getUniqueId()) {
                     return true;
                 }
             }
         }
         return false;
-	}
+    }
 
-	/**
-	 * Retrieve all filters stack
-	 * 
-	 * @return array
-	 */
-	function getAll() {
+    /**
+     * Retrieve all filters stack
+     *
+     * @return array
+     */
+    function getAll()
+    {
         return $this->filters;
-	}
+    }
 
     /**
      * Apply filters to an array
-     * 
-     * @param array $data
+     *
+     * @param array $data            
      * @return array
      */
-    function filter($data = array()) {
-        if (!is_array($data)) {
+    function filter($data = array())
+    {
+        if (! is_array($data)) {
             return $data;
         }
         // first apply the filters to the ROOT
         if (isset($this->filters[self::SELECTOR_ROOT])) {
-        	foreach ($this->filters[self::SELECTOR_ROOT] as $filter) {
-        		$data = $this->applyFilterToValue($data, $filter);
-        	}
+            foreach ($this->filters[self::SELECTOR_ROOT] as $filter) {
+                $data = $filter->filter($data);
+            }
         }
         foreach ($data as $key => $value) {
             $data[$key] = $this->filterItem($data, $key);
@@ -151,12 +220,13 @@ class Filtrator {
 
     /**
      * Apply filters on a single item in the array
-     * 
-     * @param array $data
-     * @param string $item
+     *
+     * @param array $data            
+     * @param string $item            
      * @return mixed
      */
-    function filterItem($data, $item) {
+    function filterItem($data, $item)
+    {
         $value = Utils::arrayGetByPath($data, $item);
         $value = $this->applyFilters($item, $value);
         if (is_array($value)) {
@@ -164,22 +234,24 @@ class Filtrator {
                 $value[$k] = $this->filterItem($data, "{$item}[{$k}]");
             }
         }
-        return $value; 
+        return $value;
     }
 
     /**
      * Apply filters to a single value
-     * 
-     * @param  string $item  array element path (eg: 'key' or 'key[0][subkey]')
-     * @param  mixed $value value of the item
+     *
+     * @param string $item
+     *            array element path (eg: 'key' or 'key[0][subkey]')
+     * @param mixed $value
+     *            value of the item
      * @return mixed
      */
-    function applyFilters($item, $value) {
+    function applyFilters($item, $value)
+    {
         foreach ($this->filters as $selector => $filters) {
-            if ($selector != self::SELECTOR_ROOT
-            	&& $this->itemMatchesSelector($item, $selector)) {
+            if ($selector != self::SELECTOR_ROOT && $this->itemMatchesSelector($item, $selector)) {
                 foreach ($filters as $filter) {
-                    $value = $this->applyFilterToValue($value, $filter);
+                    $value = $filter->filter($value, $item);
                 }
             }
         }
@@ -188,13 +260,15 @@ class Filtrator {
 
     /**
      * Applies a filter on a value
-     * 
-     * @param mixed $value
-     * @param array $filter a filter as is stored in the filters stack
+     *
+     * @param mixed $value            
+     * @param array $filter
+     *            a filter as is stored in the filters stack
      * @return mixed
      */
-    protected function applyFilterToValue($value, $filter) {
-        if ($filter['recursive'] and is_array($value)) {
+    protected function applyFilterToValue($value, $filter)
+    {
+        if (is_array() and is_array($value)) {
             foreach ($value as $k => $v) {
                 $value[$k] = $this->applyFilterToValue($v, $filter);
             }
@@ -208,23 +282,28 @@ class Filtrator {
 
     /**
      * Checks if an item matches a selector
-     * 
-     * @example
-     * $this->('key[subkey]', 'key[*]') -> true;
-     * $this->('key[subkey]', 'subkey') -> false;
-     * 
-     * @param string $item
-     * @param string $selector
-     * @return boolean|number
+     *
+     * @example $this->('key[subkey]', 'key[*]') -> true;
+     *          $this->('key[subkey]', 'subkey') -> false;
+     *         
+     * @param string $item            
+     * @param string $selector            
+     * @return boolean number
      */
-    protected function itemMatchesSelector($item, $selector) {
+    protected function itemMatchesSelector($item, $selector)
+    {
         // the selector is a simple path identifier
         // NOT something like key[*][subkey]
         if (strpos($selector, '*') === false) {
             return $item === $selector;
         }
-        $regex = '/' . str_replace('*', '[^\]]+', str_replace(array('[', ']'), array('\[', '\]'), $selector)) . '/';
+        $regex = '/' . str_replace('*', '[^\]]+', str_replace(array(
+            '[',
+            ']'
+        ), array(
+            '\[',
+            '\]'
+        ), $selector)) . '/';
         return preg_match($regex, $item);
     }
-
 }

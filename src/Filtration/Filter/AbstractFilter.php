@@ -1,23 +1,23 @@
 <?php
-
 namespace Sirius\Filtration\Filter;
 
+abstract class AbstractFilter
+{
 
-abstract class AbstractFilter {
+    protected $recursive = false;
 
-	protected $isRecursive = false;
-	
-	protected $options = array();
-	
-	protected $context;
-	
-    function __construct($options = array())
+    protected $options = array();
+
+    protected $context;
+
+    function __construct($options = array(), $recursive = false)
     {
-        if (is_array($options) && !empty($options)) {
+        if (is_array($options) && ! empty($options)) {
             foreach ($options as $k => $v) {
                 $this->setOption($k, $v);
             }
         }
+        $this->recursive = $recursive;
     }
 
     /**
@@ -61,7 +61,6 @@ abstract class AbstractFilter {
         $this->context = $context;
         return $this;
     }
-    
-    abstract function filter($value, $valueIdentifier = null);
 
+    abstract function filter($value, $valueIdentifier = null);
 }

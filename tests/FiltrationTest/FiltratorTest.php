@@ -38,29 +38,29 @@ class FiltratorTest extends \PHPUnit_Framework_TestCase  {
     }
     
     function testSelectorPath() {
-        $this->filtrator->add('array[whitespace]', 'trim');
+        $this->filtrator->add('array[whitespace]', 'StringTrim');
         $filtered = $this->filtrator->filter($this->data);
         $this->assertEquals('   some string   ', $filtered['whitespace']);
         $this->assertEquals('some string', $filtered['array']['whitespace']);
     }
 
     function testFilterRecursivity() {
-        $this->filtrator->add('*', 'trim', null, true, 0);
+        $this->filtrator->add('*', 'StringTrim', null, true, 0);
         $filtered = $this->filtrator->filter($this->data);
         $this->assertEquals('some string', $filtered['whitespace']);
         $this->assertEquals('some string', $filtered['array']['whitespace']);
     }
 
     function testFilterRemoval() {
-        $this->filtrator->add('*', 'trim', null, true, 0);
-        $this->filtrator->remove('*', 'trim');
+        $this->filtrator->add('*', 'StringTrim', null, true, 0);
+        $this->filtrator->remove('*', 'StringTrim');
         $filtered = $this->filtrator->filter($this->data);
         $this->assertEquals('   some string   ', $filtered['whitespace']);
     }
 
     function testFilterPriority() {
         $this->filtrator
-            ->add('whitespace', 'trim')
+            ->add('whitespace', 'StringTrim')
             ->add('whitespace', __NAMESPACE__.'\postFiltrationFunction', null, false, -1)
             ->add('whitespace', __NAMESPACE__.'\preFiltrationFunction', null, false, -1);
         $filtered = $this->filtrator->filter($this->data);
@@ -68,23 +68,15 @@ class FiltratorTest extends \PHPUnit_Framework_TestCase  {
     }
 
     function testFilteringSingleValue() {
-        $this->filtrator->add('*', 'trim', null, true);
-        $this->assertEquals('   some string   ', $this->filtrator->filter('   some string   '));
+        $this->filtrator->add('*', 'StringTrim', null, true);
+        $this->assertEquals(array('some string'), $this->filtrator->filter(array('   some string   ')));
     }
 
     function testDuplicateCallbacksNotAllowed() {
-        $this->filtrator->add('*', 'trim', null, true);
-        $this->filtrator->add('*', 'trim', null, true);
-        #var_dump($this->filtrator->getAll());
-        $this->assertEquals(array(
-            '*' => array(
-                0 => array(
-                    'callback' => 'trim',
-                    'params' => array(),
-                    'recursive' => true
-                )
-            )
-        ), $this->filtrator->getAll());
+        $this->filtrator->add('*', 'StringTrim', null, true);
+        $this->filtrator->add('*', 'StringTrim', null, true);
+
+        $this->assertEquals(1, count($this->filtrator->getAll()['*']));
     }
 
     function testExceptionThrownForUncallableFilters() {
