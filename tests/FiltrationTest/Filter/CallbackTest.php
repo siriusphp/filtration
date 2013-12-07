@@ -27,7 +27,7 @@ class CallbackTest extends \PHPUnit_Framework_TestCase {
         $args = array('some' => 'value');
         $this->filter->setOption(Callback::OPTION_CALLBACK, __NAMESPACE__.'\FakeTestClass::returnThree');
         $this->filter->setOption(Callback::OPTION_ARGUMENTS, $args);
-        $this->assertEquals(FakeTestClass::returnThree(), $this->filter->filter('abc'));
+        $this->assertEquals(FakeTestClass::returnThree('abc'), $this->filter->filter('abc'));
         
         // test the unique ID
         $uniqueId = $this->filter->getUniqueId();
@@ -38,7 +38,7 @@ class CallbackTest extends \PHPUnit_Framework_TestCase {
 
     function testStaticMethodAsArray() {
         $this->filter->setOption(Callback::OPTION_CALLBACK, array(__NAMESPACE__.'\FakeTestClass', 'returnThree'));
-        $this->assertEquals(FakeTestClass::returnThree(), $this->filter->filter('abc'));
+        $this->assertEquals(FakeTestClass::returnThree('abc'), $this->filter->filter('abc'));
 
         // test the unique ID
         $uniqueId = $this->filter->getUniqueId();
@@ -48,7 +48,7 @@ class CallbackTest extends \PHPUnit_Framework_TestCase {
     function testObjectMethod() {
         $obj = new FakeTestClass();
         $this->filter->setOption(Callback::OPTION_CALLBACK, array($obj, 'returnFour'));
-        $this->assertEquals(FakeTestClass::returnFour(), $this->filter->filter('abc'));
+        $this->assertEquals($obj->returnFour('abc'), $this->filter->filter('abc'));
 
         // test the unique ID
         $uniqueId = $this->filter->getUniqueId();

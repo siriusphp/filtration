@@ -1,6 +1,9 @@
-SiriusFiltration
-======
-Array filtering/sanitization
+#SiriusFiltration
+
+[![Build Status](https://travis-ci.org/adrianmiu/SiriusFiltration.png?branch=master)](https://travis-ci.org/adrianmiu/SiriusFiltration)
+[![Coverage Status](https://coveralls.io/repos/adrianmiu/SiriusFiltration/badge.png?branch=master)](https://coveralls.io/r/adrianmiu/SiriusFiltration?branch=master)
+
+PHP library for array filtering/sanitization
 
 Sometimes you want to make sure the values pushed by a source (eg: a user when submits a form) follow some restrictions like
 
@@ -19,8 +22,7 @@ Other times you want to make sure that the data you send to the user is parsed b
 
 To achieve this end result you need to filter the values. This is where SiriusFiltration comes into place
 
-Why (just) arrays?
-=====
+##Why (just) arrays?
 
 Arrays are easily exchangeable between entities. User input (POST or GET) is an array, an object may be populated from an array, database query row can be an array, JSON data is passed from the client and gets to the server as an array. 
 

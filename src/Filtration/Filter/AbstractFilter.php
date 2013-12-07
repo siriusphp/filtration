@@ -66,7 +66,7 @@ abstract class AbstractFilter
         if ($this->recursive && is_array($value)) {
             $result = array();
             foreach ($value as $k => $v) {
-                $vIdentifier = ($valueIdentifier) ? "$valueIdentifier[$k]" : $k;
+                $vIdentifier = ($valueIdentifier) ? "{$valueIdentifier}[{$k}]" : $k;
                 $result[$k] = $this->filter($v, $vIdentifier);
             }
             return $result;
