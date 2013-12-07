@@ -11,6 +11,16 @@ class Filtrator
     // selector to specify that the filter is applied to all ITEMS of a set
     const SELECTOR_ANY = '*';
 
+    protected $filtersMap = array(
+        'callback' => '\Sirius\Filtration\Filter\Callback',
+        'double' => '\Sirius\Filtration\Filter\Date',
+        'integer' => '\Sirius\Filtration\Filter\Integer',
+        'normalizedate' => '\Sirius\Filtration\Filter\NormalizeDate',
+        'normalizenumber' => '\Sirius\Filtration\Filter\NormalizeNumber',
+        'nullify' => '\Sirius\Filtration\Filter\Nullify',
+        'stringtrim' => '\Sirius\Filtration\Filter\StringTrim'
+    );
+
     /**
      * The list of filters available in the filtrator
      *
@@ -20,6 +30,14 @@ class Filtrator
 
     function __construct($filters = array())
     {}
+
+    function registerFilterClass($name, $class)
+    {
+        if ($class && class_exists($class) && is_subclass_of($class, '\Sirius\Filtration\Filter\AbstractFilter')) {
+            $this->filtersMap[$name] = $class;
+        }
+        return $this;
+    }
 
     /**
      * Get a valid priority number to attach to a filter
@@ -82,7 +100,7 @@ class Filtrator
 
     /**
      * Factory method to create a filter from various options
-     * 
+     *
      * @param callable|class|filter $callbackOrFilterName            
      * @param string|array $options            
      * @param bool $resursive            
@@ -112,25 +130,22 @@ class Filtrator
                 'callback' => $callbackOrFilterName,
                 'arguments' => $options
             ), $resursive);
-        } else 
-            if (is_string($callbackOrFilterName)) {
-                // use the validator map
-                if (isset($this->validatorsMap[strtolower($callbackOrFilterName)])) {
-                    $callbackOrFilterName = $this->validatorsMap[strtolower($callbackOrFilterName)];
-                }
-                if (class_exists('\Sirius\Filtration\Filter\\' . $callbackOrFilterName)) {
-                    $callbackOrFilterName = '\Sirius\Filtration\Filter\\' . $callbackOrFilterName;
-                }
-                echo $callbackOrFilterName;
-                if (class_exists($callbackOrFilterName) && is_subclass_of($callbackOrFilterName, '\Sirius\Filtration\Filter\AbstractFilter')) {
-                    $filter = new $callbackOrFilterName($options, $resursive);
-                } else {
-                    throw new \InvalidArgumentException(sprintf('Impossible to determine the filter based on the name %s', (string) $callbackOrFilterName));
-                }
-            } else 
-                if (is_object($callbackOrFilterName) && $callbackOrFilterName instanceof \Sirius\Filtration\Filter\AbstractFilter) {
-                    $filter = $callbackOrFilterName;
-                }
+        } elseif (is_string($callbackOrFilterName)) {
+            if (class_exists('\Sirius\Filtration\Filter\\' . $callbackOrFilterName)) {
+                $callbackOrFilterName = '\Sirius\Filtration\Filter\\' . $callbackOrFilterName;
+            }
+            // use the validator map
+            if (isset($this->filtersMap[strtolower($callbackOrFilterName)])) {
+                $callbackOrFilterName = $this->filtersMap[strtolower($callbackOrFilterName)];
+            }
+            if (class_exists($callbackOrFilterName) && is_subclass_of($callbackOrFilterName, '\Sirius\Filtration\Filter\AbstractFilter')) {
+                $filter = new $callbackOrFilterName($options, $resursive);
+            } else {
+                throw new \InvalidArgumentException(sprintf('Impossible to determine the filter based on the name %s', (string) $callbackOrFilterName));
+            }
+        } elseif (is_object($callbackOrFilterName) && $callbackOrFilterName instanceof \Sirius\Filtration\Filter\AbstractFilter) {
+            $filter = $callbackOrFilterName;
+        }
         if (! isset($filter)) {
             throw new \InvalidArgumentException('Invalid value for the $callbackorFilterName parameter');
         }
@@ -150,7 +165,7 @@ class Filtrator
             if ($callbackOrName === true) {
                 unset($this->filters[$selector]);
             } else {
-                if (!is_object($callbackOrName)) {
+                if (! is_object($callbackOrName)) {
                     $filter = $this->createFilter($callbackOrName);
                 } else {
                     $filter = $callbackOrName;
@@ -222,16 +237,16 @@ class Filtrator
      * Apply filters on a single item in the array
      *
      * @param array $data            
-     * @param string $item            
+     * @param string $valueIdentifier            
      * @return mixed
      */
-    function filterItem($data, $item)
+    function filterItem($data, $valueIdentifier)
     {
-        $value = Utils::arrayGetByPath($data, $item);
-        $value = $this->applyFilters($item, $value);
+        $value = Utils::arrayGetByPath($data, $valueIdentifier);
+        $value = $this->applyFilters($value, $valueIdentifier);
         if (is_array($value)) {
             foreach (array_keys($value) as $k) {
-                $value[$k] = $this->filterItem($data, "{$item}[{$k}]");
+                $value[$k] = $this->filterItem($data, "{$valueIdentifier}[{$k}]");
             }
         }
         return $value;
@@ -240,42 +255,20 @@ class Filtrator
     /**
      * Apply filters to a single value
      *
-     * @param string $item
-     *            array element path (eg: 'key' or 'key[0][subkey]')
      * @param mixed $value
      *            value of the item
+     * @param string $valueIdentifier
+     *            array element path (eg: 'key' or 'key[0][subkey]')
      * @return mixed
      */
-    function applyFilters($item, $value)
+    function applyFilters($value, $valueIdentifier)
     {
         foreach ($this->filters as $selector => $filters) {
-            if ($selector != self::SELECTOR_ROOT && $this->itemMatchesSelector($item, $selector)) {
+            if ($selector != self::SELECTOR_ROOT && $this->itemMatchesSelector($valueIdentifier, $selector)) {
                 foreach ($filters as $filter) {
-                    $value = $filter->filter($value, $item);
+                    $value = $filter->filter($value, $valueIdentifier);
                 }
             }
-        }
-        return $value;
-    }
-
-    /**
-     * Applies a filter on a value
-     *
-     * @param mixed $value            
-     * @param array $filter
-     *            a filter as is stored in the filters stack
-     * @return mixed
-     */
-    protected function applyFilterToValue($value, $filter)
-    {
-        if (is_array() and is_array($value)) {
-            foreach ($value as $k => $v) {
-                $value[$k] = $this->applyFilterToValue($v, $filter);
-            }
-        } else {
-            $params = $filter['params'];
-            array_unshift($params, $value);
-            $value = call_user_func_array($filter['callback'], $params);
         }
         return $value;
     }

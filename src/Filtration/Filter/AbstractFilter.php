@@ -4,13 +4,13 @@ namespace Sirius\Filtration\Filter;
 abstract class AbstractFilter
 {
 
-    protected $recursive = false;
+    protected $recursive = true;
 
     protected $options = array();
 
     protected $context;
 
-    function __construct($options = array(), $recursive = false)
+    function __construct($options = array(), $recursive = true)
     {
         if (is_array($options) && ! empty($options)) {
             foreach ($options as $k => $v) {
@@ -62,5 +62,18 @@ abstract class AbstractFilter
         return $this;
     }
 
-    abstract function filter($value, $valueIdentifier = null);
+    function filter($value, $valueIdentifier = null) {
+        if ($this->recursive && is_array($value)) {
+            $result = array();
+            foreach ($value as $k => $v) {
+                $vIdentifier = ($valueIdentifier) ? "$valueIdentifier[$k]" : $k;
+                $result[$k] = $this->filter($v, $vIdentifier);
+            }
+            return $result;
+        } else {
+            return $this->filterSingle($value, $valueIdentifier);
+        }
+    }
+    
+    abstract function filterSingle($value, $valueIdentifier = null);
 }
