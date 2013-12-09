@@ -28,4 +28,7 @@ Arrays are easily exchangeable between entities. User input (POST or GET) is an 
 
 If you need something more "object-oriented" you can use Zend Framework 2 Input Filter library.
 
-[go to the documentation](docs/index.md)
+##Documentation
+[general usage of the library](docs/index.md)
+[using SiriusFiltration with models](docs/modeling.md)
+[other usages for SiriusFiltration](docs/other.md)

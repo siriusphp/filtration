@@ -6,7 +6,7 @@ require_once ('path/to/siriusfiltration/autoload.php');
 $filtrator = new Sirius\Filtration\Filtrator;
 
 // syntax for adding filters
-$filtrator->add($selector, $callback, $parametersForTheCallback = null, $recursive = false, $priority = 0);
+$filtrator->add($selector, $callbackOrFilterName, $options = null, $recursive = false, $priority = 0);
 
 // strip all but the P, DIV and BR tags from the content
 $filtrator->add('content', 'strip_tags', array('<p><div><br><br/>'));
@@ -20,11 +20,30 @@ $filtrator->add('*', 'trim', null, true);
 $filteredPostData = $filtrator->filter($_POST);
 ```
 
-The `$callback` parameter can be anything that is callable: a PHP function, a static method class, an invokable object etc. 
+The `$callbackOrFilterName` parameter can be 
+
+####1. a class name that extends `\Sirius\Filtration\Filter\AbstractFilter`
+```php
+$filtrator->add('slug', '\MyApp\Filtration\Filter\Sluggify');
+```
+
+####2. a class name that belongs to the `\Sirius\Filtration\Filter` namespace
+```php
+$filtrator->add('slug', 'StringTrim');
+```
+
+####3. a filter registered within the filtrator
+```php
+$filtrator->registerFilterClass('sluggify', '\MyApp\Filtration\Filter\Sluggify');
+$filtrator->add('slug', 'sluggify');
+```
+
+####4. anything that is callable: a PHP function, a static method class, an invokable object etc. 
 The only things to keep in mind are:
 
-1. The first argument must be the value you want filtered. `trim`, `strtolower`, `ucwords` are good candidates, but not `str_replace`.
-2. The parameters passed to the callback will be added one after the other
+- The first argument must be the value you want filtered. `trim`, `strtolower`, `ucwords` are good candidates, but not `str_replace`.
+- The parameters passed to the callback will be added one after the other
+- Some PHP function will throw warnings if you pass more variables than expected and SiriusFiltration adds the context as the last parameter of any callback
 
 ```php
 function myFilter($value, $arg1, $arg2, $arg3) {
@@ -40,8 +59,14 @@ Sometimes you may want to remove filters (if your app uses events to alter its f
 You can do that like this:
 
 ```php
-// remove a single filter
-$filtrator->remove('*', 'trim');
+// remove a single filter that is a callback
+$filtrator->remove('title', 'trim');
+
+// remove a single filter that is a class
+$filtrator->remove('slug', '\MyApp\Filtration\Filter\Sluggify');
+
+// remove a single filter that is a registered filter
+$filtrator->remove('slug', 'sluggify');
 
 // remove all filters
 $filtrator->remove('*', true);
@@ -99,7 +124,7 @@ array(
 
 ## Caveats
 
-1. You cannot filter single values... easily.
+#### 1. You cannot filter single values... easily.
 
 ```php
 // you cannot have something like
@@ -109,7 +134,7 @@ $filteredString = $filtrator->filter('single string');
 $filteredString = $filtrator->filter(array('single_string'))[0];
 ```
 
-2. You cannot add the same callback twice
+#### 2. You cannot add the same callback twice
 
 ```php
 // you may want to do something like
