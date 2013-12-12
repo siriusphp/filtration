@@ -1,7 +1,7 @@
 #SiriusFiltration
 
-[![Build Status](https://travis-ci.org/adrianmiu/SiriusFiltration.png?branch=master)](https://travis-ci.org/adrianmiu/SiriusFiltration)
-[![Coverage Status](https://coveralls.io/repos/adrianmiu/SiriusFiltration/badge.png?branch=master)](https://coveralls.io/r/adrianmiu/SiriusFiltration?branch=master)
+[![Build Status](https://travis-ci.org/adrianmiu/sirius-validation.png?branch=master)](https://travis-ci.org/adrianmiu/sirius-filtration)
+[![Coverage Status](https://coveralls.io/repos/adrianmiu/sirius-validation/badge.png)](https://coveralls.io/r/adrianmiu/sirius-filtration)
 
 PHP library for array filtering/sanitization
 
