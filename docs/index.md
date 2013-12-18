@@ -53,6 +53,8 @@ function myFilter($value, $arg1, $arg2, $arg3) {
 $filtrator->add('selector', 'myFilter', array(1, 2, 3));
 ```
 
+The library comes with a list of [built-in filters](docs/filters.md)
+
 ## Removing filters
 
 Sometimes you may want to remove filters (if your app uses events to alter its functionality).

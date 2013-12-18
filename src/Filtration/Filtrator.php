@@ -13,11 +13,13 @@ class Filtrator
 
     protected $filtersMap = array(
         'callback' => '\Sirius\Filtration\Filter\Callback',
-        'double' => '\Sirius\Filtration\Filter\Date',
+        'cleanarray' => '\Sirius\Filtration\Filter\CleanArray',
+        'double' => '\Sirius\Filtration\Filter\Double',
         'integer' => '\Sirius\Filtration\Filter\Integer',
         'normalizedate' => '\Sirius\Filtration\Filter\NormalizeDate',
         'normalizenumber' => '\Sirius\Filtration\Filter\NormalizeNumber',
         'nullify' => '\Sirius\Filtration\Filter\Nullify',
+        'obfuscate' => '\Sirius\Filtration\Filter\Obfuscate',
         'stringtrim' => '\Sirius\Filtration\Filter\StringTrim'
     );
 

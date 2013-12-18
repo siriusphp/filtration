@@ -31,5 +31,6 @@ If you need something more "object-oriented" you can use Zend Framework 2 Input 
 ##Documentation
 
 - [general usage of the library](docs/index.md)
+- [built-in filters](docs/filters.md)
 - [using SiriusFiltration with models](docs/modeling.md)
 - [other usages for SiriusFiltration](docs/other.md)
