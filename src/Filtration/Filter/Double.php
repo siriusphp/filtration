@@ -19,7 +19,7 @@ class Double extends AbstractFilter
             return 0;
         }
         $value = floatval($value);
-        $multiplier = pow(10, (int)$this->options['precision']);
+        $multiplier = pow(10, (int) $this->options['precision']);
         return round($value * $multiplier) / $multiplier;
     }
 }

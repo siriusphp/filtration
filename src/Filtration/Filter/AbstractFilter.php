@@ -62,7 +62,8 @@ abstract class AbstractFilter
         return $this;
     }
 
-    function filter($value, $valueIdentifier = null) {
+    function filter($value, $valueIdentifier = null)
+    {
         if ($this->recursive && is_array($value)) {
             $result = array();
             foreach ($value as $k => $v) {
@@ -74,6 +75,6 @@ abstract class AbstractFilter
             return $this->filterSingle($value, $valueIdentifier);
         }
     }
-    
+
     abstract function filterSingle($value, $valueIdentifier = null);
 }

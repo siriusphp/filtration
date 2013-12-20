@@ -10,6 +10,10 @@ class ObfuscateTest extends \PHPUnit_Framework_TestCase {
         $this->filter = new Obfuscate();
     }
     
+    function testNoString() {
+        $this->assertEquals(5, $this->filter->filterSingle(5));
+    }
+    
     function testDefaults() {
         $this->assertEquals('******', $this->filter->filter('secret'));
     }

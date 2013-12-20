@@ -26,7 +26,7 @@ class CleanArray extends AbstractFilter
             }
             if ($v !== null) {
                 if ($arrayIsAssociative) {
-                	$result[] = $v;
+                    $result[] = $v;
                 } else {
                     $result[$k] = $v;
                 }
@@ -34,8 +34,9 @@ class CleanArray extends AbstractFilter
         }
         return $result;
     }
-    
-    function filterSingle($value, $valueIdentifier = null) {
+
+    function filterSingle($value, $valueIdentifier = null)
+    {
         return $this->filter($value, $valueIdentifier);
     }
 }

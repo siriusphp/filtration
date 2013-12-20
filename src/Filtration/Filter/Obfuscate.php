@@ -18,6 +18,11 @@ class Obfuscate extends AbstractFilter
 
     function filterSingle($value, $valueIdentifier = null)
     {
+        // not a string, move along
+        if (! is_string($value)) {
+            return $value;
+        }
+        
         $len = strlen($value);
         $start = $this->options[self::OPTION_START_CHARACTERS] ? substr($value, 0, $this->options[self::OPTION_START_CHARACTERS]) : '';
         $end = $this->options[self::OPTION_END_CHARACTERS] ? substr($value, $len - $this->options[self::OPTION_END_CHARACTERS]) : '';

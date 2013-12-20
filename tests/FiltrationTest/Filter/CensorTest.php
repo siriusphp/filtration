@@ -10,6 +10,10 @@ class CensorTest extends \PHPUnit_Framework_TestCase {
         $this->filter = new Censor();
     }
     
+    function testNoString() {
+        $this->assertEquals(5, $this->filter->filterSingle(5));
+    }
+    
     function testDefaults() {
         $this->assertEquals('F**k, f**k the f*****g f*****s', $this->filter->filter('Fuck, fuck the fucking fuckers'));
     }

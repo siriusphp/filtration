@@ -19,7 +19,7 @@ class Nullify extends AbstractFilter
             return null;
         } elseif (is_string($value) && $value == '0' && $this->options['zero']) {
             return null;
-        } elseif (!is_string($value) && $value == 0 && $this->options['zero']) {
+        } elseif (! is_string($value) && $value == 0 && $this->options['zero']) {
             return null;
         }
         return $value;
