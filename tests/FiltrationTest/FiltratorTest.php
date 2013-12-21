@@ -180,4 +180,43 @@ class FiltratorTest extends \PHPUnit_Framework_TestCase
             'another_text'=> '   abc   '
         )));
     }
+    
+    function testExceptionThrownOnInvalidSelector() {
+        $this->setExpectedException('\InvalidArgumentException');
+        $this->filtrator->add(new \stdClass());
+    }
+    
+    function testAddingMultipleRulesAtOnce() {
+        $this->filtrator->add(array(
+        	'text' => array(array('stringtrim', '{"side": "right"}')),
+            'another_text' => array(array('stringtrim', 'side=left'))
+        ));
+        $this->assertEquals(array(
+            'text' => '  abc',
+            'another_text' => 'abc   '
+        ), $this->filtrator->filter(array(
+            'text' => '  abc   ',
+            'another_text'=> '   abc   '
+        )));
+    }
+    
+    function testAddingMultipleRulesAsArrayPerSelectorAtOnce() {
+        $this->filtrator->add('text', array('stringtrim', 'truncate(limit=10)(true)(10)'));
+        $this->assertEquals(array(
+        	'text' => 'A text that...'
+        ), $this->filtrator->filter(array(
+        	'text' => '     A text that is more than 10 characters long'
+        )));
+    }
+    
+    
+    function testAddingMultipleRulesAsStringPerSelectorAtOnce() {
+        $this->filtrator->add('text', 'stringtrim | truncate(limit=10)(true)(10)');
+        $this->assertEquals(array(
+        	'text' => 'A text that...'
+        ), $this->filtrator->filter(array(
+        	'text' => '     A text that is more than 10 characters long'
+        )));
+    }
+    
 }

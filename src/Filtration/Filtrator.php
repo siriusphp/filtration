@@ -13,6 +13,7 @@ class Filtrator
 
     protected $filtersMap = array(
         'callback' => '\Sirius\Filtration\Filter\Callback',
+        'censor' => '\Sirius\Filtration\Filter\Censor',
         'cleanarray' => '\Sirius\Filtration\Filter\CleanArray',
         'double' => '\Sirius\Filtration\Filter\Double',
         'integer' => '\Sirius\Filtration\Filter\Integer',
@@ -20,7 +21,9 @@ class Filtrator
         'normalizenumber' => '\Sirius\Filtration\Filter\NormalizeNumber',
         'nullify' => '\Sirius\Filtration\Filter\Nullify',
         'obfuscate' => '\Sirius\Filtration\Filter\Obfuscate',
-        'stringtrim' => '\Sirius\Filtration\Filter\StringTrim'
+        'stringtrim' => '\Sirius\Filtration\Filter\StringTrim',
+        'trim' => '\Sirius\Filtration\Filter\StringTrim',
+        'truncate' => '\Sirius\Filtration\Filter\Truncate'
     );
 
     /**
@@ -31,7 +34,9 @@ class Filtrator
     protected $filters = array();
 
     function __construct($filters = array())
-    {}
+    {
+        $this->add($filters);
+    }
 
     function registerFilterClass($name, $class)
     {
@@ -74,10 +79,17 @@ class Filtrator
      *          $filtrator->add('title', '\strip_tags');
      *          // anonymous function
      *          $filtrator->add('title', function($value){ return $value . '!!!'; });
-     *          // filter class from the library
+     *          // filter class from the library registered on the $filtersMap
      *          $filtrator->add('title', 'normalizedate', array('format' => 'm/d/Y'));
      *          // custom class
      *          $filtrator->add('title', '\MyApp\Filters\CustomFilter');
+     *          // multiple filters as once with different ways to pass options
+     *          $filtrator->add('title', array(
+     *          array('truncate', 'limit=10', true, 10),
+     *          array('censor', array('words' => array('faggy', 'idiot'))
+     *          ));
+     *          // multiple fitlers as a single string
+     *          $filtrator->add('title', 'stringtrim(side=left)(true)(10) | truncate(limit=100)');
      * @param string $selector            
      * @param
      *            callable|filter class name|\Sirius\Filtration\Filter\AbstractFilter $callbackOrFilterName
@@ -88,6 +100,62 @@ class Filtrator
      */
     function add($selector, $callbackOrFilterName, $options = null, $recursive = false, $priority = 0)
     {
+        /**
+         * $selector is actually an array with filters
+         *
+         * @example $filtrator->add(array(
+         *          'title' => array('trim', array('truncate', '{"limit":100}'))
+         *          'description' => array('trim')
+         *          ));
+         */
+        if (is_array($selector)) {
+            foreach ($selector as $key => $filters) {
+                $this->add($key, $filters);
+            }
+            return $this;
+        }
+        
+        if (! is_string($selector)) {
+            throw new \InvalidArgumentException('The data selector for filtering must be a string');
+        }
+
+        
+        if (is_string($callbackOrFilterName)) {
+            // rule was supplied like 'trim' or 'trim | nullify'
+            if (strpos($callbackOrFilterName, ' | ') !== false) {
+                return $this->add($selector, explode(' | ', $callbackOrFilterName));
+            }
+            // rule was supplied like this 'trim(limit=10)(true)(10)'
+            if (strpos($callbackOrFilterName, '(') !== false) {
+                list ($callbackOrFilterName, $options, $recursive, $priority) = $this->parseRule($callbackOrFilterName);
+            }
+        }
+        
+        /**
+         * The $callbackOrFilterName is an array of filters
+         *
+         * @example $filtrator->add('title', array(
+         *          'trim',
+         *          array('truncate', '{"limit":100}')
+         *          ));
+         */
+        if (is_array($callbackOrFilterName) && ! is_callable($callbackOrFilterName)) {
+            foreach ($callbackOrFilterName as $filter) {
+                // $filter is something like array('truncate', '{"limit":100}')
+                if (is_array($filter) && ! is_callable($filter)) {
+                    $args = $filter;
+                    array_unshift($args, $selector);
+                    call_user_func_array(array(
+                        $this,
+                        'add'
+                    ), $args);
+                } elseif (is_string($filter) || is_callable($filter)) {
+                    $this->add($selector, $filter);
+                }
+            }
+            return $this;
+        }
+        
         $filter = $this->createFilter($callbackOrFilterName, $options, $recursive);
         if (! $this->has($selector, $filter)) {
             $priority = $this->getValidPriority($selector, $priority);
@@ -98,6 +166,56 @@ class Filtrator
             ksort($this->filters[$selector]);
         }
         return $this;
+    }
+
+    /**
+     * Converts a rule that was supplied as string into a set of options that define the rule
+     *
+     * @example 'minLength({"min":2})(true)(10)'
+     *         
+     *          will be converted into
+     *         
+     *          array(
+     *          'minLength', // validator name
+     *          array('min' => 2'), // validator options
+     *          true, // recursive
+     *          10 // priority
+     *          )
+     * @param string $ruleAsString            
+     * @return array
+     */
+    protected function parseRule($ruleAsString)
+    {
+        $ruleAsString = trim($ruleAsString);
+        
+        $name = '';
+        $options = array();
+        $recursive = false;
+        $priority = 0;
+        
+        $name = substr($ruleAsString, 0, strpos($ruleAsString, '('));
+        $ruleAsString = substr($ruleAsString, strpos($ruleAsString, '('));
+        $matches = array();
+        preg_match_all('/\(([^\)]*)\)/', $ruleAsString, $matches);
+        
+        if (isset($matches[1])) {
+            if (isset($matches[1][0]) && $matches[1][0]) {
+                $options = $matches[1][0];
+            }
+            if (isset($matches[1][1]) && $matches[1][1]) {
+                $recursive = (in_array($matches[1][1], array(true, 'TRUE', 'true', 1))) ? true : false;
+            }
+            if (isset($matches[1][2]) && $matches[1][2]) {
+                $priority = (int)$matches[1][2];
+            }
+        }
+        
+        return array(
+            $name,
+            $options,
+            $recursive,
+            $priority
+        );
     }
 
     /**
