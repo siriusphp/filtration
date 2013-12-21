@@ -90,7 +90,7 @@ class Filtrator
      *          ));
      *          // multiple fitlers as a single string
      *          $filtrator->add('title', 'stringtrim(side=left)(true)(10) | truncate(limit=100)');
-     * @param string $selector            
+     * @param string|array $selector            
      * @param
      *            callable|filter class name|\Sirius\Filtration\Filter\AbstractFilter $callbackOrFilterName
      * @param string|array $params            
@@ -98,7 +98,7 @@ class Filtrator
      * @param number $priority            
      * @return \Sirius\Filtration\Filtrator
      */
-    function add($selector, $callbackOrFilterName, $options = null, $recursive = false, $priority = 0)
+    function add($selector, $callbackOrFilterName = null, $options = null, $recursive = false, $priority = 0)
     {
         /**
          * $selector is actually an array with filters
