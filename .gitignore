@@ -3,3 +3,6 @@ LICENSE.txt
 README.txt
 tests/report
 build
+/.settings
+/.buildpath
+/.project
