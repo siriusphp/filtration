@@ -203,7 +203,7 @@ class FiltratorTest extends \PHPUnit_Framework_TestCase
     function testAddingMultipleRulesAsArrayPerSelectorAtOnce() {
         $this->filtrator->add('text', array('stringtrim', 'truncate(limit=10)(true)(10)'));
         $this->assertEquals(array(
-        	'text' => 'A text that...'
+        	'text' => 'A text tha...'
         ), $this->filtrator->filter(array(
         	'text' => '     A text that is more than 10 characters long'
         )));
@@ -213,7 +213,7 @@ class FiltratorTest extends \PHPUnit_Framework_TestCase
     function testAddingMultipleRulesAsStringPerSelectorAtOnce() {
         $this->filtrator->add('text', 'stringtrim | truncate(limit=10)(true)(10)');
         $this->assertEquals(array(
-        	'text' => 'A text that...'
+        	'text' => 'A text tha...'
         ), $this->filtrator->filter(array(
         	'text' => '     A text that is more than 10 characters long'
         )));
