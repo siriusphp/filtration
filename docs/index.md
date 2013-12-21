@@ -20,7 +20,7 @@ $filtrator->add('*', 'trim', null, true);
 $filteredPostData = $filtrator->filter($_POST);
 ```
 
-The `$callbackOrFilterName` parameter can be 
+### The `$callbackOrFilterName` parameter can be: 
 
 ####1. a class name that extends `\Sirius\Filtration\Filter\AbstractFilter`
 ```php
@@ -54,6 +54,51 @@ $filtrator->add('selector', 'myFilter', array(1, 2, 3));
 ```
 
 The library comes with a list of [built-in filters](docs/filters.md)
+
+### the `$options` parameter can be:
+
+1. An associative array that will be passed to the filtrator class
+2. A non-associative array of arguments that will be passed to the callback
+3. A JSON string (will be converted into an array using `json_decode`)
+4. A jquery string (will be converted into an array using `parse_str`)
+
+## Syntactic sugar
+
+#### Add all your filters in one go
+```php
+$filtrator->add(array(
+    'key_a' => 'stringtrim',
+	'key_b' => array(
+		'stringtrim'
+		array('truncate', array('limit' => 10))
+	)
+));
+```
+
+#### Add all the filters of one selector in one go
+```php
+$filtrator->add('selector', array(
+	'stringtrim'
+	array('truncate', array('limit' => 10))
+));
+```
+
+#### Add filters as a single string (separate them with `[space][pipe][space]`)
+```php
+$filtrator->add('selector', 'stringrim | truncate(limit=10)(true)(10)');
+```
+
+#### Mix and match anything you like
+```php
+$filtrator->add(array(
+    // use parantheses to pass parameters, recursiveness and priority
+	'key_a' => 'stringtrim | nullify | truncate(limit=10)(true)(10)', 
+	'key_b' => 'stringtrim | nullify'
+));
+
+// or
+$filtrator->add('selector', 'stringtrim | nullify | truncate(limit=10)(true)(10)');
+```
 
 ## Removing filters
 
@@ -134,18 +179,4 @@ $filteredString = $filtrator->filter('single string');
 
 // but you can filter fake it
 $filteredString = $filtrator->filter(array('single_string'))[0];
-```
-
-#### 2. You cannot add the same callback twice
-
-```php
-// you may want to do something like
-$filtrator->add('selector', 'trim', array("\n\t"));
-// and later on
-$filtrator->add('selector', 'trim', array(" "));
-// but the second add() will not add the filter on the stack
-// you can however do it like this
-$filtrator->add('selector', function($value) {
-    return trim($value, ' ');
-});
 ```
