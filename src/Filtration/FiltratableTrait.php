@@ -12,7 +12,7 @@ trait FiltratableTrait {
         return $this;
     }
 
-    function getFiltrator($filtrator) {
+    function getFiltrator() {
         if (!$this->filtrator) {
             $this->filtrator = new Filtrator();
         }
