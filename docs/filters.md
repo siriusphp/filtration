@@ -87,3 +87,13 @@ Options:
 
 - side: where the string will be trimmed. Possible values: `left`|`right`|`both`. Default: `both`.
 - characters: list of characters that will be trimmed. Default: `\t\n\r `
+
+## Truncate
+
+Truncates a string to a maximum number of characters
+
+Options:
+
+- limit: max limit of the returned string. Default: FALSE.
+- break_words: whether or not breaking a word is a allowed: Default: TRUE
+- ellipsis: character added at the end when the string is truncated. Default: ...

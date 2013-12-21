@@ -10,7 +10,10 @@ class StringTrimTest extends \PHPUnit_Framework_TestCase {
         $this->filter = new StringTrim();
     }
     
-
+    function testNoString() {
+        $this->assertEquals(5, $this->filter->filterSingle(5));
+    }
+    
     function testRecursivity() {
         $result = $this->filter->filter(array('   abc', 'def   '));
         $this->assertEquals(array('abc', 'def'), $result);
