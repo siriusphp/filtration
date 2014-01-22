@@ -1,5 +1,5 @@
 {
-    "name": "adrianmiu/sirius-filtration",
+    "name": "siriusphp/filtration",
     "description": "Data filtration library",
     "type": "library",
     "license": "MIT",
