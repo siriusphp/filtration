@@ -5,7 +5,9 @@
     "license": "MIT",
     "keywords": [
         "form",
-        "validation"
+        "input",
+        "filtration",
+        "sanitization"
     ],
     "authors": [
         {
@@ -13,8 +15,6 @@
             "email": "adrian@adrianmiu.ro"
         }
     ],
-    "version": "1.0.0",
-    "minimum-stability": "dev",
     "require": {
         "php": ">=5.4"
     },

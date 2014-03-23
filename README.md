@@ -1,7 +1,9 @@
-#SiriusFiltration
+#Sirius\Filtration
 
-[![Build Status](https://travis-ci.org/adrianmiu/sirius-filtration.png?branch=master)](https://travis-ci.org/adrianmiu/sirius-filtration)
-[![Coverage Status](https://coveralls.io/repos/adrianmiu/sirius-filtration/badge.png)](https://coveralls.io/r/adrianmiu/sirius-filtration)
+[![Build Status](https://travis-ci.org/siriusphp/filtration.png?branch=master)](https://travis-ci.org/siriusphp/filtration)
+[![Coverage Status](https://coveralls.io/repos/siriusphp/filtration/badge.png)](https://coveralls.io/r/siriusphp/filtration)
+[![Latest Stable Version](https://poser.pugx.org/siriusphp/filtration/version.png)](https://packagist.org/packages/siriusphp/filtration)
+[![License](https://poser.pugx.org/siriusphp/filtration/license.png)](https://packagist.org/packages/siriusphp/filtration)
 
 PHP library for array filtering/sanitization
 
