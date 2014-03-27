@@ -22,9 +22,6 @@ class NormalizeDate extends AbstractFilter
 
     protected function parseDateFromString($string, $format)
     {
-        if (! date_default_timezone_get()) {
-            date_default_timezone_set('UTC');
-        }
         $result = date_parse_from_format($format, $string);
         return mktime((int) $result['hour'], (int) $result['minute'], (int) $result['second'], (int) $result['month'], (int) $result['day'], (int) $result['year']);
     }

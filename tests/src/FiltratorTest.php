@@ -25,7 +25,8 @@ class FiltratorTest extends \PHPUnit_Framework_TestCase
 
     function setUp()
     {
-        $this->filtrator = new Filtrator();
+        $this->filterFactory = new FilterFactory();
+        $this->filtrator = new Filtrator($this->filterFactory);
         $this->data = array(
             'whitespace' => '   some string   ',
             'html' => '   <strong><em>html</em></strong>',
@@ -114,7 +115,7 @@ class FiltratorTest extends \PHPUnit_Framework_TestCase
 
     function testFiltersMap()
     {
-        $this->filtrator->registerFilterClass('removewhitespace', '\Sirius\Filtration\Filter\StringTrim');
+        $this->filterFactory->registerFilter('removewhitespace', '\Sirius\Filtration\Filter\StringTrim');
         $this->filtrator->add('trim', 'removewhitespace');
         $this->assertEquals(array(
             'trim' => 'abc',

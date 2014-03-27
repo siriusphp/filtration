@@ -6,7 +6,7 @@
     </logging>
     <testsuites>
         <testsuite name="Sirius Filtrator Test Suite">
-            <directory>./FiltrationTest/</directory>
+            <directory>./src/</directory>
         </testsuite>
     </testsuites>
 </phpunit>

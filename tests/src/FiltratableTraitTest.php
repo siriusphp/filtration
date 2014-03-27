@@ -49,9 +49,11 @@ class FiltratableTraitTest extends \PHPUnit_Framework_TestCase
     }
     
     function testSettingNewFiltrator() {
-        $this->form->setFiltrator(new Filtrator(array(
+        $filtrator = new Filtrator();
+        $filtrator->add(array(
             'title' => 'stringtrim | nullify | truncate(limit=10)',
-        )));
+        ));
+        $this->form->setFiltrator($filtrator);
         $this->form->setValues(array(
         	'title' => 'Title is very long',
             'description' => '    '
