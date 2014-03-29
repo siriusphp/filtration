@@ -3,7 +3,7 @@ namespace Sirius\Filtration;
 
 use Sirius\Filtration\Utils;
 
-class Filtrator
+class Filtrator implements FiltratorInterface
 {
     // selector to specify that the filter is applied to the entire data set
     const SELECTOR_ROOT = '/';
