@@ -22,8 +22,8 @@
         "satooshi/php-coveralls": "dev-master"
     },
     "autoload": {
-        "psr-0": {
-            "Sirius": "src/"
-        }
+        "files": [
+            "autoload.php"
+        ]
     }
 }
