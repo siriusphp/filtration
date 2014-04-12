@@ -37,9 +37,9 @@ abstract class AbstractFilter
      *
      * The options are also be passed to the error message.
      *
-     * @param string $name            
-     * @param mixed $value            
-     * @return \Sirius\Validation\Validator\AbstractValidator
+     * @param string $name
+     * @param mixed $value
+     * @return self
      */
     function setOption($name, $value)
     {
@@ -53,8 +53,8 @@ abstract class AbstractFilter
      * For example, when you need to validate an email field matches another email field,
      * to confirm the email address
      *
-     * @param array|object $context            
-     * @return \Sirius\Validation\Validator\AbstractValidator
+     * @param array|object $context
+     * @return self
      */
     function setContext($context)
     {

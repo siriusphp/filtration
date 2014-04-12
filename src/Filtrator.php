@@ -1,18 +1,17 @@
 <?php
 namespace Sirius\Filtration;
 
-use Sirius\Filtration\Utils;
 
 class Filtrator implements FiltratorInterface
 {
     // selector to specify that the filter is applied to the entire data set
     const SELECTOR_ROOT = '/';
-    
+
     // selector to specify that the filter is applied to all ITEMS of a set
     const SELECTOR_ANY = '*';
 
     protected $filterFactory;
-    
+
     /**
      * The list of filters available in the filtrator
      *
@@ -46,13 +45,15 @@ class Filtrator implements FiltratorInterface
      *          ));
      *          // multiple fitlers as a single string
      *          $filtrator->add('title', 'stringtrim(side=left)(true)(10) | truncate(limit=100)');
-     * @param string|array $selector            
-     * @param
-     *            callable|filter class name|\Sirius\Filtration\Filter\AbstractFilter $callbackOrFilterName
-     * @param string|array $params            
-     * @param bool $recursive            
-     * @param number $priority            
-     * @return \Sirius\Filtration\Filtrator
+     * @param string|array $selector
+     * @param mixed $callbackOrFilterName
+     * @param array|null $options
+     * @param bool $recursive
+     * @param integer $priority
+     * @throws \InvalidArgumentException
+     * @internal param $ callable|filter class name|\Sirius\Filtration\Filter\AbstractFilter $callbackOrFilterName*            callable|filter class name|\Sirius\Filtration\Filter\AbstractFilter $callbackOrFilterName
+     * @internal param array|string $params
+     * @return self
      */
     function add($selector, $callbackOrFilterName = null, $options = null, $recursive = false, $priority = 0)
     {
@@ -70,12 +71,12 @@ class Filtrator implements FiltratorInterface
             }
             return $this;
         }
-        
+
         if (! is_string($selector)) {
             throw new \InvalidArgumentException('The data selector for filtering must be a string');
         }
 
-        
+
         if (is_string($callbackOrFilterName)) {
             // rule was supplied like 'trim' or 'trim | nullify'
             if (strpos($callbackOrFilterName, ' | ') !== false) {
@@ -86,7 +87,7 @@ class Filtrator implements FiltratorInterface
                 list ($callbackOrFilterName, $options, $recursive, $priority) = $this->parseRule($callbackOrFilterName);
             }
         }
-        
+
         /**
          * The $callbackOrFilterName is an array of filters
          *
@@ -111,12 +112,14 @@ class Filtrator implements FiltratorInterface
             }
             return $this;
         }
-        
+
         $filter = $this->filterFactory->createFilter($callbackOrFilterName, $options, $recursive);
         if (! array_key_exists($selector, $this->filters)) {
             $this->filters[$selector] = new FilterSet();
         }
-        $this->filters[$selector]->insert($filter, $priority);
+        /* @var $filterSet FilterSet */
+        $filterSet = $this->filters[$selector];
+        $filterSet->insert($filter, $priority);
         return $this;
     }
 
@@ -124,32 +127,31 @@ class Filtrator implements FiltratorInterface
      * Converts a rule that was supplied as string into a set of options that define the rule
      *
      * @example 'minLength({"min":2})(true)(10)'
-     *         
+     *
      *          will be converted into
-     *         
+     *
      *          array(
      *          'minLength', // validator name
      *          array('min' => 2'), // validator options
      *          true, // recursive
      *          10 // priority
      *          )
-     * @param string $ruleAsString            
+     * @param string $ruleAsString
      * @return array
      */
     protected function parseRule($ruleAsString)
     {
         $ruleAsString = trim($ruleAsString);
-        
-        $name = '';
+
         $options = array();
         $recursive = false;
         $priority = 0;
-        
+
         $name = substr($ruleAsString, 0, strpos($ruleAsString, '('));
         $ruleAsString = substr($ruleAsString, strpos($ruleAsString, '('));
         $matches = array();
         preg_match_all('/\(([^\)]*)\)/', $ruleAsString, $matches);
-        
+
         if (isset($matches[1])) {
             if (isset($matches[1][0]) && $matches[1][0]) {
                 $options = $matches[1][0];
@@ -161,7 +163,7 @@ class Filtrator implements FiltratorInterface
                 $priority = (int)$matches[1][2];
             }
         }
-        
+
         return array(
             $name,
             $options,
@@ -173,8 +175,9 @@ class Filtrator implements FiltratorInterface
     /**
      * Remove a filter from the stack
      *
-     * @param string $selector            
-     * @param callable|classname|filter|TRUE $callbackOrName            
+     * @param string $selector
+     * @param bool|callable|string|TRUE $callbackOrName
+     * @throws \InvalidArgumentException
      * @return \Sirius\Filtration\Filtrator
      */
     function remove($selector, $callbackOrName = true)
@@ -188,7 +191,9 @@ class Filtrator implements FiltratorInterface
                 } else {
                     $filter = $callbackOrName;
                 }
-                $this->filters[$selector]->remove($filter);
+                /* @var $filterSet FilterSet */
+                $filterSet = $this->filters[$selector];
+                $filterSet->remove($filter);
             }
         }
         return $this;
@@ -207,7 +212,7 @@ class Filtrator implements FiltratorInterface
     /**
      * Apply filters to an array
      *
-     * @param array $data            
+     * @param array $data
      * @return array
      */
     function filter($data = array())
@@ -217,6 +222,7 @@ class Filtrator implements FiltratorInterface
         }
         // first apply the filters to the ROOT
         if (isset($this->filters[self::SELECTOR_ROOT])) {
+            /* @var $rootFilters FilterSet */
             $rootFilters = $this->filters[self::SELECTOR_ROOT];
             $data = $rootFilters->applyFilters($data);
         }
@@ -229,8 +235,8 @@ class Filtrator implements FiltratorInterface
     /**
      * Apply filters on a single item in the array
      *
-     * @param array $data            
-     * @param string $valueIdentifier            
+     * @param array $data
+     * @param string $valueIdentifier
      * @return mixed
      */
     function filterItem($data, $valueIdentifier)
@@ -252,11 +258,13 @@ class Filtrator implements FiltratorInterface
      *            value of the item
      * @param string $valueIdentifier
      *            array element path (eg: 'key' or 'key[0][subkey]')
+     * @param mixed $context
      * @return mixed
      */
     function applyFilters($value, $valueIdentifier, $context)
     {
         foreach ($this->filters as $selector => $filterSet) {
+            /* @var $filterSet FilterSet */
             if ($selector != self::SELECTOR_ROOT && $this->itemMatchesSelector($valueIdentifier, $selector)) {
                 $value = $filterSet->applyFilters($value, $valueIdentifier, $context);
             }
@@ -269,9 +277,9 @@ class Filtrator implements FiltratorInterface
      *
      * @example $this->('key[subkey]', 'key[*]') -> true;
      *          $this->('key[subkey]', 'subkey') -> false;
-     *         
-     * @param string $item            
-     * @param string $selector            
+     *
+     * @param string $item
+     * @param string $selector
      * @return boolean number
      */
     protected function itemMatchesSelector($item, $selector)

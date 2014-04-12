@@ -22,16 +22,14 @@ class Truncate extends AbstractFilter
         if (! is_string($value)) {
             return $value;
         }
-        
+
         if (! $this->options[self::OPTION_LIMIT] || strlen($value) <= $this->options[self::OPTION_LIMIT]) {
             return $value;
         }
-        
-        $truncated = $value;
-        
+
         $limit = $this->options[self::OPTION_LIMIT];
         $firstSpace = strpos($value, ' ');
-        
+
         // in case word breaking is not allowed find the previous space
         if (!$this->options[self::OPTION_BREAK_WORDS]) {
             if ($firstSpace === false) {
@@ -46,14 +44,14 @@ class Truncate extends AbstractFilter
             && substr($value, $limit + 1, 1) != ' ') {
             $isWordBreaker = true;
         }
-        
+
         $truncated = rtrim(substr($value, 0, $limit));
-        
+
         if ($this->options[self::OPTION_ELLIPSIS]
             && $truncated != $value) {
             $truncated .= $this->options[self::OPTION_ELLIPSIS];
         }
-        
+
         return $truncated;
     }
 }

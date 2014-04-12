@@ -5,20 +5,20 @@ namespace Sirius\Filtration;
 class FilterSet extends \SplPriorityQueue{
     /**
      * Cache of priorities that were already taken
-     * 
+     *
      * @var array
      */
     protected $allocatedPriorities = array();
-    
+
     function __construct() {
         $this->setExtractFlags(static::EXTR_BOTH);
     }
-    
+
     function compare($priority1, $priority2) {
         if ($priority1 === $priority2) return 0;
         return $priority1 < $priority2 ? 1 : -1;
     }
-    
+
     function insert($filter, $priority) {
         if (!$filter instanceof Filter\AbstractFilter) {
             throw new \InvalidArgumentException('Only filter instances can be added to the filter set');
@@ -31,6 +31,7 @@ class FilterSet extends \SplPriorityQueue{
         }
         // use `clone` because iterating over Priority Queues removes elements from the queue
         foreach (clone $this as $v) {
+            /* @var $v \Sirius\Filtration\Filter\AbstractFilter */
             if ($v->getUniqueId() === $filter->getUniqueId()) {
                 return;
             }
@@ -38,17 +39,20 @@ class FilterSet extends \SplPriorityQueue{
         array_push($this->allocatedPriorities, $priority);
         return parent::insert($filter, $priority);
     }
-    
+
     function remove($filter) {
+        /* @var $filter \Sirius\Filtration\Filter\AbstractFilter */
         if (!$filter instanceof Filter\AbstractFilter) {
             throw new \InvalidArgumentException('Only filter instances can be removed from the filter set');
         }
         $filters = array();
         $this->top();
         while($this->valid()) {
-            $node = $this->current();
-            if ($node['data']->getUniqueId() !== $filter->getUniqueId()) {
-                $filters[$node['priority']] = $node['data'];
+            $item = $this->current();
+            /* @var $itemFilter \Sirius\Filtration\Filter\AbstractFilter */
+            $itemFilter = $item['data'];
+            if ($itemFilter->getUniqueId() !== $filter->getUniqueId()) {
+                $filters[$item['priority']] = $item['data'];
             }
             $this->next();
         }
@@ -57,7 +61,7 @@ class FilterSet extends \SplPriorityQueue{
         }
         return $this;
     }
-    
+
     /**
      * Get a valid priority number to attach to a filter
      *
@@ -82,13 +86,14 @@ class FilterSet extends \SplPriorityQueue{
         }
         return $desiredPriority;
     }
-    
+
     function applyFilters($value, $valueIdentifier = null, $context = null) {
         foreach (clone $this as $filter) {
+            /* @var $filter \Sirius\Filtration\Filter\AbstractFilter */
             $filter->setContext($context);
             $value = $filter->filter($value, $valueIdentifier);
         }
         return $value;
     }
-    
+
 }

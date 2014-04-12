@@ -2,7 +2,7 @@
 
 namespace Sirius\Filtration;
 
-use Sirius\Filtration\Filtrator;
+
 
 trait FiltratableTrait {
     protected $filtrator;

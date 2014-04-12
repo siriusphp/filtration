@@ -2,8 +2,11 @@
 
 namespace Sirius\Filtration;
 
+use Sirius\Filtration\Filter\AbstractFilter;
+use Sirius\Filtration\Filter\Callback;
+
 class FilterFactory {
-    
+
     protected $filtersMap = array(
         'callback' => '\Sirius\Filtration\Filter\Callback',
         'censor' => '\Sirius\Filtration\Filter\Censor',
@@ -26,16 +29,16 @@ class FilterFactory {
         }
         return $this;
     }
-    
-    
+
+
     /**
      * Factory method to create a filter from various options
      *
-     * @param callable|class|filter $callbackOrFilterName            
-     * @param string|array $options            
-     * @param bool $resursive            
+     * @param callable|string $callbackOrFilterName
+     * @param string|array $options
+     * @param bool $resursive
      * @throws \InvalidArgumentException
-     * @return \Sirius\Filtration\Filter\AbstractFilter
+     * @return AbstractFilter
      */
     function createFilter($callbackOrFilterName, $options = null, $resursive = false)
     {
@@ -50,13 +53,13 @@ class FilterFactory {
         } elseif (! $options) {
             $options = array();
         }
-        
+
         if (! is_array($options)) {
             throw new \InvalidArgumentException('Validator options should be an array, JSON string or query string');
         }
-        
+
         if (is_callable($callbackOrFilterName)) {
-            $filter = new \Sirius\Filtration\Filter\Callback(array(
+            $filter = new Callback(array(
                 'callback' => $callbackOrFilterName,
                 'arguments' => $options
             ), $resursive);
@@ -73,7 +76,7 @@ class FilterFactory {
             } else {
                 throw new \InvalidArgumentException(sprintf('Impossible to determine the filter based on the name %s', (string) $callbackOrFilterName));
             }
-        } elseif (is_object($callbackOrFilterName) && $callbackOrFilterName instanceof \Sirius\Filtration\Filter\AbstractFilter) {
+        } elseif (is_object($callbackOrFilterName) && $callbackOrFilterName instanceof AbstractFilter) {
             $filter = $callbackOrFilterName;
         }
         if (! isset($filter)) {
