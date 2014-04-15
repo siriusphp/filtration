@@ -204,7 +204,7 @@ class Filtrator implements FiltratorInterface
      *
      * @return array
      */
-    function getAll()
+    function getFilters()
     {
         return $this->filters;
     }

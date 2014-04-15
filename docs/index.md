@@ -20,7 +20,7 @@ $filtrator->add('*', 'trim', null, true);
 $filteredPostData = $filtrator->filter($_POST);
 ```
 
-### The `$callbackOrFilterName` parameter can be: 
+### The `$callbackOrFilterName` parameter can be:
 
 ####1. a class name that extends `\Sirius\Filtration\Filter\AbstractFilter`
 ```php
@@ -38,7 +38,7 @@ $filtrator->registerFilterClass('sluggify', '\MyApp\Filtration\Filter\Sluggify')
 $filtrator->add('slug', 'sluggify');
 ```
 
-####4. anything that is callable: a PHP function, a static method class, an invokable object etc. 
+####4. anything that is callable: a PHP function, a static method class, an invokable object etc.
 The only things to keep in mind are:
 
 - The first argument must be the value you want filtered. `trim`, `strtolower`, `ucwords` are good candidates, but not `str_replace`.
@@ -92,7 +92,7 @@ $filtrator->add('selector', 'stringrim | truncate(limit=10)(true)(10)');
 ```php
 $filtrator->add(array(
     // use parantheses to pass parameters, recursiveness and priority
-	'key_a' => 'stringtrim | nullify | truncate(limit=10)(true)(10)', 
+	'key_a' => 'stringtrim | nullify | truncate(limit=10)(true)(10)',
 	'key_b' => 'stringtrim | nullify'
 ));
 
@@ -138,7 +138,7 @@ function convertDateArraysToString ($data, $source, $destination) {
 	return $data;
 }
 
-$filtrator->add(Filtrator::SELECTOR_ROOT, 'convertDateArraysToString', array('date_as_array', 'date')); 
+$filtrator->add(Filtrator::SELECTOR_ROOT, 'convertDateArraysToString', array('date_as_array', 'date'));
 $data = $filtrator->filter($data);
 $data['date'] == '2012-1-12'; // true
 ```
@@ -156,7 +156,7 @@ The code above will apply all the filters associated with the selector that matc
 
 You may need to retrieve the list of filters for various reasons (eg: you need to converted into a list of javascript filters for the client side)
 ```php
-$filters = $filtrator->getAll();
+$filters = $filtrator->getFilters();
 // returns an array
 array(
     'selector' => array(

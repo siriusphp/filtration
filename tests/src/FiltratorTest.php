@@ -97,8 +97,8 @@ class FiltratorTest extends \PHPUnit_Framework_TestCase
     {
         $this->filtrator->add('*', 'StringTrim', null, true);
         $this->filtrator->add('*', 'StringTrim', null, true);
-        
-        $this->assertEquals(1, count($this->filtrator->getAll()['*']));
+
+        $this->assertEquals(1, count($this->filtrator->getFilters()['*']));
     }
 
     function testExceptionThrownForUncallableFilters()
@@ -130,9 +130,9 @@ class FiltratorTest extends \PHPUnit_Framework_TestCase
         	'real' => 'fake'
         ), $this->filtrator->filter(array(
         	'real' => 'real'
-        ))); 
+        )));
     }
-    
+
     function testAddingObjectsAsFilters() {
         $this->filtrator->add('trim', new \Sirius\Filtration\Filter\StringTrim());
         $this->assertEquals(array(
@@ -141,25 +141,25 @@ class FiltratorTest extends \PHPUnit_Framework_TestCase
             'trim' => '  abc  ',
         )));
     }
-    
+
     function testExceptionThrownIfFilterCannotBeConstructed() {
         $this->setExpectedException('\InvalidArgumentException');
         $this->filtrator->add('trim', new \stdClass());
     }
-    
+
     function testFilteringNonArrays() {
         $obj = new \stdClass();
         $obj->key = 'value';
         $this->assertEquals($obj, $this->filtrator->filter($obj));
     }
-    
+
     function testRemovingAllFiltersForASelector()
     {
         $this->filtrator->add('whitespace', __NAMESPACE__ . '\postFiltrationFunction')->add('whitespace', __NAMESPACE__ . '\preFiltrationFunction');
         $this->filtrator->remove('whitespace', true);
-        $this->assertEquals(array(), $this->filtrator->getAll());
+        $this->assertEquals(array(), $this->filtrator->getFilters());
     }
-    
+
     function testRemovingObjectsAsFilters() {
         $this->filtrator->add('trim', new \Sirius\Filtration\Filter\StringTrim());
         $this->filtrator->remove('trim', new \Sirius\Filtration\Filter\StringTrim());
@@ -169,7 +169,7 @@ class FiltratorTest extends \PHPUnit_Framework_TestCase
             'trim' => '  abc  ',
         )));
     }
-    
+
     function testFilterOptions() {
         $this->filtrator->add('text', 'stringtrim', '{"side": "right"}');
         $this->filtrator->add('another_text', 'stringtrim', "side=left");
@@ -181,12 +181,12 @@ class FiltratorTest extends \PHPUnit_Framework_TestCase
             'another_text'=> '   abc   '
         )));
     }
-    
+
     function testExceptionThrownOnInvalidSelector() {
         $this->setExpectedException('\InvalidArgumentException');
         $this->filtrator->add(new \stdClass());
     }
-    
+
     function testAddingMultipleRulesAtOnce() {
         $this->filtrator->add(array(
         	'text' => array(array('stringtrim', '{"side": "right"}')),
@@ -200,7 +200,7 @@ class FiltratorTest extends \PHPUnit_Framework_TestCase
             'another_text'=> '   abc   '
         )));
     }
-    
+
     function testAddingMultipleRulesAsArrayPerSelectorAtOnce() {
         $this->filtrator->add('text', array('stringtrim', 'truncate(limit=10)(true)(10)'));
         $this->assertEquals(array(
@@ -209,8 +209,8 @@ class FiltratorTest extends \PHPUnit_Framework_TestCase
         	'text' => '     A text that is more than 10 characters long'
         )));
     }
-    
-    
+
+
     function testAddingMultipleRulesAsStringPerSelectorAtOnce() {
         $this->filtrator->add('text', 'stringtrim | truncate(limit=10)(true)(10)');
         $this->assertEquals(array(
@@ -219,5 +219,5 @@ class FiltratorTest extends \PHPUnit_Framework_TestCase
         	'text' => '     A text that is more than 10 characters long'
         )));
     }
-    
+
 }
