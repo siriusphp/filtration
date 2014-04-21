@@ -2,6 +2,7 @@
 
 [![Build Status](https://travis-ci.org/siriusphp/filtration.png?branch=master)](https://travis-ci.org/siriusphp/filtration)
 [![Coverage Status](https://coveralls.io/repos/siriusphp/filtration/badge.png)](https://coveralls.io/r/siriusphp/filtration)
+[![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/siriusphp/filtration/badges/quality-score.png?s=1897aacdd8313df10089c5307b336c0fde8624db)](https://scrutinizer-ci.com/g/siriusphp/filtration/)
 [![Latest Stable Version](https://poser.pugx.org/siriusphp/filtration/version.png)](https://packagist.org/packages/siriusphp/filtration)
 [![License](https://poser.pugx.org/siriusphp/filtration/license.png)](https://packagist.org/packages/siriusphp/filtration)
 
