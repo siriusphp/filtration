@@ -32,9 +32,16 @@ $filtrator->add('slug', '\MyApp\Filtration\Filter\Sluggify');
 $filtrator->add('slug', 'StringTrim');
 ```
 
-####3. a filter registered within the filtrator
+####3. a filter registered within the filter factory
+
+The filtrator depends on a FilterFactory
 ```php
-$filtrator->registerFilterClass('sluggify', '\MyApp\Filtration\Filter\Sluggify');
+// create an instance of the filter factory; here through a DIC
+$filterFactory = $dependencyInjectionContainer->get('Sirius\Filtration\FilterFactory');
+$filterFactory->registerFilter('sluggify', '\MyApp\Filtration\Filter\Sluggify');
+
+// inject the factory into the filtrator
+$filtrator = new Filtrator($filterFactory);
 $filtrator->add('slug', 'sluggify');
 ```
 
@@ -43,7 +50,7 @@ The only things to keep in mind are:
 
 - The first argument must be the value you want filtered. `trim`, `strtolower`, `ucwords` are good candidates, but not `str_replace`.
 - The parameters passed to the callback will be added one after the other
-- Some PHP function will throw warnings if you pass more variables than expected and SiriusFiltration adds the context as the last parameter of any callback
+- Some PHP function will throw warnings if you pass more variables than expected and `Sirius\Filtration` adds the context as the last parameter of any callback
 
 ```php
 function myFilter($value, $arg1, $arg2, $arg3) {
@@ -122,7 +129,7 @@ $filtrator->remove('*', true);
 ## Transforming data
 
 Sometimes the data provided may come in "wrong" shape. For example a date field may be set in $_POST as an array on a different key but you only need a regular string to manipulate.
-For this situations you need to transform the data, not filter it.
+For this situations you need to transform the data, not 'really' filter it.
 
 ```php
 $data = array(

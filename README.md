@@ -25,11 +25,39 @@ Other times you want to make sure that the data you send to the user is parsed b
 
 To achieve this end result you need to filter the values. This is where SiriusFiltration comes into place
 
+## Elevator pitch
+
+```php
+use Sirius\Filtration\Filtrator;
+
+$filtrator = new Filtrator();
+
+// add filters for title
+$filtrator->add('title', 'trim');
+$filtrator->add('title', 'strip_tags');
+$filtrator->add('title', 'nullify');
+
+// add filters for content in one go
+$filtrator->add('content', [
+	'trim'
+]);
+
+$result = $filtrator->filter(array(
+	'title' => '   <h1>My title has tags and is awesome</h1>',
+	'content' => '   My content was trimmed'
+));
+
+/* $result is
+array(
+	'title' => NULL ,
+	'content' => 'My content was trimmed'
+)
+*/
+```
+
 ##Why (just) arrays?
 
-Arrays are easily exchangeable between entities. User input (POST or GET) is an array, an object may be populated from an array, database query row can be an array, JSON data is passed from the client and gets to the server as an array. 
-
-If you need something more "object-oriented" you can use Zend Framework 2 Input Filter library.
+Arrays are easily exchangeable between components. User input (POST or GET) is an array, an object may be populated from an array, database query row can be an array, JSON data is passed from the client and gets to the server as an array. 
 
 ##Documentation
 
