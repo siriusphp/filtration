@@ -43,11 +43,6 @@ class FiltratableTraitTest extends \PHPUnit_Framework_TestCase
         ), $this->form->getValues());
     }
     
-    function testExceptionOnInvalidFiltrator() {
-        $this->setExpectedException('\Exception');
-        $this->form->setFiltrator(new \stdClass());
-    }
-    
     function testSettingNewFiltrator() {
         $filtrator = new Filtrator();
         $filtrator->add(array(
