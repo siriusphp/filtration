@@ -1,10 +1,11 @@
 #Sirius\Filtration
 
-[![Build Status](https://travis-ci.org/siriusphp/filtration.png?branch=master)](https://travis-ci.org/siriusphp/filtration)
-[![Coverage Status](https://coveralls.io/repos/siriusphp/filtration/badge.png)](https://coveralls.io/r/siriusphp/filtration)
-[![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/siriusphp/filtration/badges/quality-score.png?s=1897aacdd8313df10089c5307b336c0fde8624db)](https://scrutinizer-ci.com/g/siriusphp/filtration/)
-[![Latest Stable Version](https://poser.pugx.org/siriusphp/filtration/version.png)](https://packagist.org/packages/siriusphp/filtration)
-[![License](https://poser.pugx.org/siriusphp/filtration/license.png)](https://packagist.org/packages/siriusphp/filtration)
+[![Source Code](http://img.shields.io/badge/source-siriusphp/filtration-blue.svg?style=flat-square)](https://github.com/siriusphp/filtration)
+[![Latest Version](https://img.shields.io/packagist/v/siriusphp/filtration.svg?style=flat-square)](https://github.com/siriusphp/filtration/releases)
+[![Software License](https://img.shields.io/badge/license-MIT-brightgreen.svg?style=flat-square)](https://github.com/siriusphp/filtration/blob/master/LICENSE)
+[![Build Status](https://img.shields.io/travis/siriusphp/filtration/master.svg?style=flat-square)](https://travis-ci.org/siriusphp/filtration)
+[![Coverage Status](https://img.shields.io/scrutinizer/coverage/g/siriusphp/filtration.svg?style=flat-square)](https://scrutinizer-ci.com/g/siriusphp/filtration/code-structure)
+[![Quality Score](https://img.shields.io/scrutinizer/g/siriusphp/filtration.svg?style=flat-square)](https://scrutinizer-ci.com/g/siriusphp/filtration)
 
 PHP library for array filtering/sanitization
 
@@ -55,13 +56,8 @@ array(
 */
 ```
 
-##Why (just) arrays?
 
-Arrays are easily exchangeable between components. User input (POST or GET) is an array, an object may be populated from an array, database query row can be an array, JSON data is passed from the client and gets to the server as an array. 
+##Links
 
-##Documentation
-
-- [general usage of the library](docs/index.md)
-- [built-in filters](docs/filters.md)
-- [using SiriusFiltration with models](docs/modeling.md)
-- [other usages for SiriusFiltration](docs/other.md)
+- [documentation](http://www.sirius.ro/php/sirius/validation/)
+- [changelog](CHANGELOG.md)

@@ -1,0 +1,71 @@
+template:
+    url: https://github.com/siriusphp/Template-ReadTheDocs
+
+# List of directories to exclude from the processing (default contains "vendor" and "website")
+# Paths are relative to the repository root
+exclude:
+    - website
+    - vendor
+    - test
+    - src
+    - build
+
+# Base URL of the published website (no "/" at the end!)
+# You are advised to set and use this variable to write your links in the HTML layouts
+baseUrl: http://www.sirius.ro/php/sirius/filtration
+
+projectName: Sirius\Filtration
+title: Sirius\Filtration
+subTitle: Framework agnostic data filtering library
+
+# The left menu bar
+menu:
+    sections:
+#        versions:
+#            name: Versions
+#            items:
+#                two:
+#                    text: "2.0"
+#                    relativeUrl:
+#                one:
+#                    text: "1.0"
+#                    relativeUrl: 1_0/
+        guide:
+            name: Getting started
+            items:
+                getting_started:
+                    text: Introduction
+                    relativeUrl:
+                installation:
+                    text: Installation
+                    relativeUrl: installation.html
+                simple_example:
+                    text: Simple example
+                    relativeUrl: simple_example.html
+                filters:
+                    text: Built-in filters
+                    relativeUrl: filters.html
+                syntactic_sugar:
+                    text: Syntactic sugar
+                    relativeUrl: syntactic_sugar.html
+        advanced:
+            name: Advanced topics
+            items:
+                special_selectors:
+                    text: Special selectors
+                    relativeUrl: special_selectors.html
+                custom_filter:
+                    text: Custom filters
+                    relativeUrl: custom_filters.html
+                filter_factory:
+                    text: The filter factory
+                    relativeUrl: filter_factory.html
+        cookbook:
+            name: Cookbook
+            items:
+                modeling:
+                    text: Filtration for models
+                    relativeUrl: model_filtration.html
+                outputing:
+                    text: Filtration for output
+                    relativeUrl: output_filtration.html
