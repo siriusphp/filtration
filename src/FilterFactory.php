@@ -42,22 +42,6 @@ class FilterFactory {
      */
     function createFilter($callbackOrFilterName, $options = null, $resursive = false)
     {
-        if ($options && is_string($options)) {
-            $startChar = substr($options, 0, 1);
-            if ($startChar == '{' || $startChar == '[') {
-                $options = json_decode($options, true);
-            } else {
-                parse_str($options, $output);
-                $options = $output;
-            }
-        } elseif (! $options) {
-            $options = array();
-        }
-
-        if (! is_array($options)) {
-            throw new \InvalidArgumentException('Validator options should be an array, JSON string or query string');
-        }
-
         if (is_callable($callbackOrFilterName)) {
             $filter = new Callback(array(
                 'callback' => $callbackOrFilterName,

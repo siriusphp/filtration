@@ -27,7 +27,7 @@ class FiltratorTest extends \PHPUnit_Framework_TestCase
     {
         $this->filterFactory = new FilterFactory();
         $this->filtrator = new Filtrator($this->filterFactory);
-        $this->data = array(
+        $this->sampleData = array(
             'whitespace' => '   some string   ',
             'html' => '   <strong><em>html</em></strong>',
             'array' => array(
@@ -46,14 +46,14 @@ class FiltratorTest extends \PHPUnit_Framework_TestCase
             $value['text'] = trim(strip_tags($value['html']));
             return $value;
         });
-        $filtered = $this->filtrator->filter($this->data);
+        $filtered = $this->filtrator->filter($this->sampleData);
         $this->assertEquals('html', $filtered['text']);
     }
 
     function testSelectorPath()
     {
         $this->filtrator->add('array[whitespace]', 'StringTrim');
-        $filtered = $this->filtrator->filter($this->data);
+        $filtered = $this->filtrator->filter($this->sampleData);
         $this->assertEquals('   some string   ', $filtered['whitespace']);
         $this->assertEquals('some string', $filtered['array']['whitespace']);
     }
@@ -61,7 +61,7 @@ class FiltratorTest extends \PHPUnit_Framework_TestCase
     function testFilterRecursivity()
     {
         $this->filtrator->add('*', 'StringTrim', null, true, 0);
-        $filtered = $this->filtrator->filter($this->data);
+        $filtered = $this->filtrator->filter($this->sampleData);
         $this->assertEquals('some string', $filtered['whitespace']);
         $this->assertEquals('some string', $filtered['array']['whitespace']);
     }
@@ -70,7 +70,7 @@ class FiltratorTest extends \PHPUnit_Framework_TestCase
     {
         $this->filtrator->add('*', 'StringTrim', null, true, 0);
         $this->filtrator->remove('*', 'StringTrim');
-        $filtered = $this->filtrator->filter($this->data);
+        $filtered = $this->filtrator->filter($this->sampleData);
         $this->assertEquals('   some string   ', $filtered['whitespace']);
     }
 
@@ -79,7 +79,7 @@ class FiltratorTest extends \PHPUnit_Framework_TestCase
         $this->filtrator->add('whitespace', 'StringTrim')
             ->add('whitespace', __NAMESPACE__ . '\postFiltrationFunction', null, false, - 1)
             ->add('whitespace', __NAMESPACE__ . '\preFiltrationFunction', null, false, - 1);
-        $filtered = $this->filtrator->filter($this->data);
+        $filtered = $this->filtrator->filter($this->sampleData);
         $this->assertEquals('pre.   some string   .post', $filtered['whitespace']);
     }
 

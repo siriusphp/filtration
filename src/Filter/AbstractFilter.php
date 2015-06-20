@@ -12,12 +12,34 @@ abstract class AbstractFilter
 
     function __construct($options = array(), $recursive = true)
     {
+        $options = $this->normalizeOptions($options);
         if (is_array($options) && ! empty($options)) {
             foreach ($options as $k => $v) {
                 $this->setOption($k, $v);
             }
         }
         $this->recursive = $recursive;
+    }
+
+    protected function normalizeOptions($options) {
+        if ($options && is_string($options)) {
+            $startChar = substr($options, 0, 1);
+            if ($startChar == '{' || $startChar == '[') {
+                $options = json_decode($options, true);
+            } else {
+                parse_str($options, $output);
+                $options = $output;
+            }
+        } elseif (! $options) {
+            $options = array();
+        }
+
+        if (! is_array($options)) {
+            throw new \InvalidArgumentException('Filtrator options should be an array, JSON string or query string');
+        }
+
+        return $options;
+
     }
 
     /**
