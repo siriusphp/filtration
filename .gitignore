@@ -5,3 +5,5 @@ build
 .idea/
 docs/.couscous
 docs/couscous.phar
+vendor/
+composer.lock
