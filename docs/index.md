@@ -58,8 +58,6 @@ array(
 
 # How to use SiriusFiltration
 
-```
-
 ### The `$callbackOrFilterName` parameter can be:
 
 ####1. a class name that extends `\Sirius\Filtration\Filter\AbstractFilter`
@@ -109,44 +107,6 @@ The library comes with a list of [built-in filters](docs/filters.md)
 3. A JSON string (will be converted into an array using `json_decode`)
 4. A jquery string (will be converted into an array using `parse_str`)
 
-## Syntactic sugar
-
-#### Add all your filters in one go
-```php
-$filtrator->add(array(
-    'key_a' => 'stringtrim',
-	'key_b' => array(
-		'stringtrim'
-		array('truncate', array('limit' => 10))
-	)
-));
-```
-
-#### Add all the filters of one selector in one go
-```php
-$filtrator->add('selector', array(
-	'stringtrim'
-	array('truncate', array('limit' => 10))
-));
-```
-
-#### Add filters as a single string (separate them with `[space][pipe][space]`)
-```php
-$filtrator->add('selector', 'stringrim | truncate(limit=10)(true)(10)');
-```
-
-#### Mix and match anything you like
-```php
-$filtrator->add(array(
-    // use parantheses to pass parameters, recursiveness and priority
-	'key_a' => 'stringtrim | nullify | truncate(limit=10)(true)(10)',
-	'key_b' => 'stringtrim | nullify'
-));
-
-// or
-$filtrator->add('selector', 'stringtrim | nullify | truncate(limit=10)(true)(10)');
-```
-
 ## Removing filters
 
 Sometimes you may want to remove filters (if your app uses events to alter its functionality).
@@ -165,7 +125,7 @@ $filtrator->remove('slug', 'sluggify');
 // remove all filters
 $filtrator->remove('*', true);
 ```
-
+    
 ## Transforming data
 
 Sometimes the data provided may come in "wrong" shape. For example a date field may be set in $_POST as an array on a different key but you only need a regular string to manipulate.
@@ -180,7 +140,7 @@ $data = array(
     )
 );
 function convertDateArraysToString ($data, $source, $destination) {
-	$data[$destination] = sprintf('%s-%s-%s, $data[$source]['year'], $data[$source]['month'], $data[$source]['day']);
+	$data[$destination] = sprintf('%s-%s-%s', $data[$source]['year'], $data[$source]['month'], $data[$source]['day']);
 	// make sure you return the data back
 	return $data;
 }
