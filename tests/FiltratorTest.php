@@ -55,9 +55,10 @@ class FiltratorTest extends TestCase
 
     function testSelectorPath()
     {
+        $this->filtrator->add('whitespace', 'StringTrim');
         $this->filtrator->add('array[whitespace]', 'StringTrim');
         $filtered = $this->filtrator->filter($this->sampleData);
-        $this->assertEquals('   some string   ', $filtered['whitespace']);
+        $this->assertEquals('some string', $filtered['whitespace']);
         $this->assertEquals('some string', $filtered['array']['whitespace']);
     }
 
@@ -71,7 +72,8 @@ class FiltratorTest extends TestCase
 
     function testAllowedSelectors()
     {
-        $this->filtrator->setAllowedSelectors(['whitespace', 'array[whitespace]']);
+        $this->filtrator->add('array[whitespace]', 'StringTrim');
+        $this->filtrator->setAllowed(['whitespace']);
         $filtered = $this->filtrator->filter($this->sampleData);
         $this->assertTrue(isset($filtered['whitespace']));
         $this->assertTrue(isset($filtered['array']['whitespace']));

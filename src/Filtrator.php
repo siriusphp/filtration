@@ -22,7 +22,12 @@ class Filtrator implements FiltratorInterface
     /**
      * @var array
      */
-    protected $allowedSelectors;
+    protected $allowedSelectors = [];
+
+    /**
+     * @var array
+     */
+    protected $compiledAllowedSelectors = [];
 
     public function __construct(FilterFactory $filterFactory = null)
     {
@@ -32,17 +37,8 @@ class Filtrator implements FiltratorInterface
         $this->filterFactory = $filterFactory;
     }
 
-    public function setAllowedSelectors(array $allowedSelectors = [])
+    public function setAllowed(array $allowedSelectors = [])
     {
-        foreach (array_values($allowedSelectors) as $selector) {
-            while ($lastPart = strrpos($selector, '[')) {
-                $parent = substr($selector, 0, $lastPart);
-                if (!in_array($parent, $allowedSelectors)) {
-                    $allowedSelectors[] = $parent;
-                }
-                $selector = $parent;
-            }
-        }
         $this->allowedSelectors = $allowedSelectors;
     }
 
@@ -139,6 +135,8 @@ class Filtrator implements FiltratorInterface
         /* @var $filterSet FilterSet */
         $filterSet = $this->filters[$selector];
         $filterSet->insert($filter, $priority);
+        $this->compiledAllowedSelectors = [];
+
         return $this;
     }
 
@@ -215,6 +213,8 @@ class Filtrator implements FiltratorInterface
                 $filterSet->remove($filter);
             }
         }
+        $this->compiledAllowedSelectors = [];
+
         return $this;
     }
 
@@ -239,12 +239,16 @@ class Filtrator implements FiltratorInterface
         if (! is_array($data)) {
             return $data;
         }
+
         // first apply the filters to the ROOT
         if (isset($this->filters[self::SELECTOR_ROOT])) {
             /* @var $rootFilters FilterSet */
             $rootFilters = $this->filters[self::SELECTOR_ROOT];
             $data = $rootFilters->applyFilters($data);
         }
+
+        $this->compileAllowedSelectors();
+
         $result = [];
         foreach ($data as $key => $value) {
             if ($this->itemIsAllowed($key)) {
@@ -300,14 +304,44 @@ class Filtrator implements FiltratorInterface
 
     private function itemIsAllowed($item)
     {
-        if (empty($this->allowedSelectors)) {
+        if (empty($this->compiledAllowedSelectors)) {
             return true;
         }
-        foreach ($this->allowedSelectors as $selector) {
+        foreach ($this->compiledAllowedSelectors as $selector) {
             if (Utils::itemMatchesSelector($item, $selector)) {
                 return true;
             }
         }
         return false;
+    }
+
+    private function compileAllowedSelectors()
+    {
+        if (!empty($this->compiledAllowedSelectors)) {
+            return;
+        }
+
+        $selectors = array_unique(array_merge(
+            array_values($this->allowedSelectors),
+            array_keys($this->filters)
+        ));
+
+        $compiled = [];
+
+        foreach ($selectors as $selector) {
+            if ($selector == '/' || $selector == '*') {
+                continue;
+            }
+            $compiled[] = $selector;
+            while ($lastPart = strrpos($selector, '[')) {
+                $parent = substr($selector, 0, $lastPart);
+                if (!in_array($parent, $compiled)) {
+                    $compiled[] = $parent;
+                }
+                $selector = $parent;
+            }
+        }
+
+        $this->compiledAllowedSelectors = $compiled;
     }
 }

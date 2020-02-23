@@ -111,19 +111,16 @@ The library comes with a list of [built-in filters](docs/filters.md)
 
 ## Set allowed items
 
-If you want to ensure that you don't get unwanted data you specify which item are allowed. Any other data will be excluded:
+Sometimes you want to allow other items in the input without having to filter them. For that you have to specify them:
 
 ```php
-$filtrator->setAllowedSelectors([
-    'name',
-    'description',
-    'products', // if not provided, this will be inferred from the next rules
-    'products[*][name]',
-    'products[*][description]'
+$filtrator->setAllowed([
+    'id',
+    'price'
 ]);
 ```
 
-If the data to be filtered contains, say a `user_id` element, it will be excluded from the array. 
+You only have to do this for items that are NOT filtered. Items (aka "selectors") that have filters, will be automatically permitted.
 
 ## Removing filters
 
