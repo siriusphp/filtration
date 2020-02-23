@@ -3,6 +3,8 @@ declare(strict_types=1);
 
 namespace Sirius\Filtration;
 
+use Sirius\Filtration\Filter\AbstractFilter as AbstractFilterAlias;
+
 class FilterSet extends \SplPriorityQueue
 {
     /**
@@ -38,7 +40,7 @@ class FilterSet extends \SplPriorityQueue
         }
         // use `clone` because iterating over Priority Queues removes elements from the queue
         foreach (clone $this as $v) {
-            /* @var $v \Sirius\Filtration\Filter\AbstractFilter */
+            /* @var $v AbstractFilterAlias */
             if ($v->getUniqueId() === $filter->getUniqueId()) {
                 return;
             }
@@ -49,7 +51,7 @@ class FilterSet extends \SplPriorityQueue
 
     public function remove($filter)
     {
-        /* @var $filter \Sirius\Filtration\Filter\AbstractFilter */
+        /* @var $filter AbstractFilterAlias */
         if (!$filter instanceof Filter\AbstractFilter) {
             throw new \InvalidArgumentException('Only filter instances can be removed from the filter set');
         }
@@ -57,7 +59,7 @@ class FilterSet extends \SplPriorityQueue
         $this->top();
         while ($this->valid()) {
             $item = $this->current();
-            /* @var $itemFilter \Sirius\Filtration\Filter\AbstractFilter */
+            /* @var $itemFilter AbstractFilterAlias */
             $itemFilter = $item['data'];
             if ($itemFilter->getUniqueId() !== $filter->getUniqueId()) {
                 $filters[$item['priority']] = $item['data'];
@@ -98,7 +100,7 @@ class FilterSet extends \SplPriorityQueue
     public function applyFilters($value, $valueIdentifier = null, $context = null)
     {
         foreach (clone $this as $filter) {
-            /* @var $filter \Sirius\Filtration\Filter\AbstractFilter */
+            /* @var $filter AbstractFilterAlias */
             $filter->setContext($context);
             $value = $filter->filter($value, $valueIdentifier);
         }
