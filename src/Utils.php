@@ -36,4 +36,21 @@ class Utils
         }
         return array_key_exists($container, $array) ? self::arrayGetByPath($array[$container], $subpath) : null;
     }
+
+    public static function itemMatchesSelector($item, $selector)
+    {
+        // the selector is a simple path identifier
+        // NOT something like key[*][subkey]
+        if (strpos($selector, '*') === false) {
+            return $item === $selector;
+        }
+        $regex = '/' . str_replace('*', '[^\]]+', str_replace(array(
+                '[',
+                ']'
+            ), array(
+                '\[',
+                '\]'
+            ), $selector)) . '/';
+        return preg_match($regex, (string) $item);
+    }
 }

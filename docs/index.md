@@ -33,14 +33,14 @@ use Sirius\Filtration\Filtrator;
 
 $filtrator = new Filtrator();
 
-// add filters for title
-$filtrator->add('title', 'trim');
-$filtrator->add('title', 'strip_tags');
-$filtrator->add('title', 'nullify');
+// add filters for content
+$filtrator->add('content', 'trim');
 
-// add filters for content in one go
-$filtrator->add('content', [
-	'trim'
+// add filters for titles in
+$filtrator->add('title', [
+	'trim',
+    'strip_tags',
+    'nullify'
 ]);
 
 $result = $filtrator->filter([
@@ -48,29 +48,29 @@ $result = $filtrator->filter([
 	'content' => '   My content was trimmed'
 ]);
 
-/* $result is
-[
-	'title' => NULL ,
+$result == [
+	'title' => NULL, // because it contains only HTML
 	'content' => 'My content was trimmed'
-]
-*/
+];
 ```
 
-# How to use SiriusFiltration
+# How to use Sirius\Filtration
 
-### The `$callbackOrFilterName` parameter can be:
+## Add filters
 
-####1. a class name that extends `\Sirius\Filtration\Filter\AbstractFilter`
+The second parameter can be:
+
+##### - a class name that extends `\Sirius\Filtration\Filter\AbstractFilter`
 ```php
 $filtrator->add('slug', '\MyApp\Filtration\Filter\Sluggify');
 ```
 
-####2. a class name that belongs to the `\Sirius\Filtration\Filter` namespace
+##### - a class name that belongs to the `\Sirius\Filtration\Filter` namespace
 ```php
 $filtrator->add('slug', 'StringTrim');
 ```
 
-####3. a filter registered within the filter factory
+##### - a filter registered within the filter factory
 
 The filtrator depends on a FilterFactory
 ```php
@@ -83,7 +83,7 @@ $filtrator = new Filtrator($filterFactory);
 $filtrator->add('slug', 'sluggify');
 ```
 
-####4. anything that is callable: a PHP function, a static method class, an invokable object etc.
+##### - a callable: a PHP function, a static method class, an invokable object etc.
 The only things to keep in mind are:
 
 - The first argument must be the value you want filtered. `trim`, `strtolower`, `ucwords` are good candidates, but not `str_replace`.
@@ -106,6 +106,22 @@ The library comes with a list of [built-in filters](docs/filters.md)
 2. A non-associative array of arguments that will be passed to the callback
 3. A JSON string (will be converted into an array using `json_decode`)
 4. A jquery string (will be converted into an array using `parse_str`)
+
+## Set allowed items
+
+If you want to ensure that you don't get unwanted data you specify which item are allowed. Any other data will be excluded:
+
+```php
+$filtrator->setAllowedSelectors([
+    'name',
+    'description',
+    'products', // if not provided, this will be inferred from the next rules
+    'products[*][name]',
+    'products[*][description]'
+]);
+```
+
+If the data to be filtered contains, say a `user_id` element, it will be excluded from the array. 
 
 ## Removing filters
 

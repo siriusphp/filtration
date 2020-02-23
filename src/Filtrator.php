@@ -19,12 +19,31 @@ class Filtrator implements FiltratorInterface
      */
     protected $filters = array();
 
+    /**
+     * @var array
+     */
+    protected $allowedSelectors;
+
     public function __construct(FilterFactory $filterFactory = null)
     {
         if (!$filterFactory) {
             $filterFactory = new FilterFactory();
         }
         $this->filterFactory = $filterFactory;
+    }
+
+    public function setAllowedSelectors(array $allowedSelectors = [])
+    {
+        foreach (array_values($allowedSelectors) as $selector) {
+            while ($lastPart = strrpos($selector, '[')) {
+                $parent = substr($selector, 0, $lastPart);
+                if (!in_array($parent, $allowedSelectors)) {
+                    $allowedSelectors[] = $parent;
+                }
+                $selector = $parent;
+            }
+        }
+        $this->allowedSelectors = $allowedSelectors;
     }
 
     /**
@@ -226,10 +245,13 @@ class Filtrator implements FiltratorInterface
             $rootFilters = $this->filters[self::SELECTOR_ROOT];
             $data = $rootFilters->applyFilters($data);
         }
+        $result = [];
         foreach ($data as $key => $value) {
-            $data[$key] = $this->filterItem($data, $key);
+            if ($this->itemIsAllowed($key)) {
+                $result[$key] = $this->filterItem($data, $key);
+            }
         }
-        return $data;
+        return $result;
     }
 
     /**
@@ -244,9 +266,13 @@ class Filtrator implements FiltratorInterface
         $value = Utils::arrayGetByPath($data, $valueIdentifier);
         $value = $this->applyFilters($value, $valueIdentifier, $data);
         if (is_array($value)) {
+            $result = [];
             foreach (array_keys($value) as $k) {
-                $value[$k] = $this->filterItem($data, "{$valueIdentifier}[{$k}]");
+                if ($this->itemIsAllowed("{$valueIdentifier}[{$k}]")) {
+                    $result[$k] = $this->filterItem($data, "{$valueIdentifier}[{$k}]");
+                }
             }
+            return $result;
         }
         return $value;
     }
@@ -265,37 +291,23 @@ class Filtrator implements FiltratorInterface
     {
         foreach ($this->filters as $selector => $filterSet) {
             /* @var $filterSet FilterSet */
-            if ($selector != self::SELECTOR_ROOT && $this->itemMatchesSelector($valueIdentifier, $selector)) {
+            if ($selector != self::SELECTOR_ROOT && Utils::itemMatchesSelector($valueIdentifier, $selector)) {
                 $value = $filterSet->applyFilters($value, $valueIdentifier, $context);
             }
         }
         return $value;
     }
 
-    /**
-     * Checks if an item matches a selector
-     *
-     * @example $this->('key[subkey]', 'key[*]') -> true;
-     *          $this->('key[subkey]', 'subkey') -> false;
-     *
-     * @param string $item
-     * @param string $selector
-     * @return boolean number
-     */
-    protected function itemMatchesSelector($item, $selector)
+    private function itemIsAllowed($item)
     {
-        // the selector is a simple path identifier
-        // NOT something like key[*][subkey]
-        if (strpos($selector, '*') === false) {
-            return $item === $selector;
+        if (empty($this->allowedSelectors)) {
+            return true;
         }
-        $regex = '/' . str_replace('*', '[^\]]+', str_replace(array(
-            '[',
-            ']'
-        ), array(
-            '\[',
-            '\]'
-        ), $selector)) . '/';
-        return preg_match($regex, (string) $item);
+        foreach ($this->allowedSelectors as $selector) {
+            if (Utils::itemMatchesSelector($item, $selector)) {
+                return true;
+            }
+        }
+        return false;
     }
 }

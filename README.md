@@ -57,7 +57,7 @@ array(
 ```
 
 
-##Links
+## Links
 
 - [documentation](http://www.sirius.ro/php/sirius/validation/)
 - [changelog](CHANGELOG.md)
