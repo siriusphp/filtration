@@ -1,12 +1,13 @@
 <?php
+declare(strict_types=1);
 
 namespace Sirius\Filtration;
 
-interface FiltratorInterface {
+interface FiltratorInterface
+{
+    public function add($selector, $callbackOrFilterName = null, $options = null, $recursive = false, $priority = 0);
 
-    function add($selector, $callbackOrFilterName = null, $options = null, $recursive = false, $priority = 0);
+    public function remove($selector, $callbackOrName = true);
 
-    function remove($selector, $callbackOrName = true);
-
-    function filter($data = array());
+    public function filter($data = array());
 }

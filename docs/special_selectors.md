@@ -29,14 +29,14 @@ function convertDateArrays($value, $options, $valueIdentifier, $context) {
 
 $filtrator->add('/', 'convertDateArrays');
 
-$result = $filtrator->filter(array(
-    '__date' => array('year'=> 2000, 'month' => 10, 'day' => 5),
-));
+$result = $filtrator->filter([
+    '__date' => ['year'=> 2000, 'month' => 10, 'day' => 5],
+]);
 
 // $result will be
-// array(
+// [
 //     'date' => '2000-10-5'
-// )
+// ]
 ```
 
 **Important!** The `root` filters are applied first so you can also use it to globally clean all of your data

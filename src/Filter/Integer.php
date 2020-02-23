@@ -1,10 +1,10 @@
 <?php
+declare(strict_types=1);
 namespace Sirius\Filtration\Filter;
 
 class Integer extends AbstractFilter
 {
-
-    function filterSingle($value, $valueIdentifier = null)
+    public function filterSingle($value, $valueIdentifier = null)
     {
         if (is_object($value)) {
             return $value;

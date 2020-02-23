@@ -1,16 +1,16 @@
 <?php
+declare(strict_types=1);
 namespace Sirius\Filtration\Filter;
 
 abstract class AbstractFilter
 {
-
     protected $recursive = true;
 
     protected $options = array();
 
     protected $context;
 
-    function __construct($options = array(), $recursive = true)
+    public function __construct($options = array(), $recursive = true)
     {
         $options = $this->normalizeOptions($options);
         if (is_array($options) && ! empty($options)) {
@@ -21,7 +21,8 @@ abstract class AbstractFilter
         $this->recursive = $recursive;
     }
 
-    protected function normalizeOptions($options) {
+    protected function normalizeOptions($options)
+    {
         if ($options && is_string($options)) {
             $startChar = substr($options, 0, 1);
             if ($startChar == '{' || $startChar == '[') {
@@ -39,7 +40,6 @@ abstract class AbstractFilter
         }
 
         return $options;
-
     }
 
     /**
@@ -49,7 +49,7 @@ abstract class AbstractFilter
      *
      * @return string
      */
-    function getUniqueId()
+    public function getUniqueId()
     {
         return get_called_class() . '|' . json_encode(ksort($this->options));
     }
@@ -63,7 +63,7 @@ abstract class AbstractFilter
      * @param mixed $value
      * @return self
      */
-    function setOption($name, $value)
+    public function setOption($name, $value)
     {
         $this->options[$name] = $value;
         return $this;
@@ -78,13 +78,13 @@ abstract class AbstractFilter
      * @param array|object $context
      * @return self
      */
-    function setContext($context)
+    public function setContext($context)
     {
         $this->context = $context;
         return $this;
     }
 
-    function filter($value, $valueIdentifier = null)
+    public function filter($value, $valueIdentifier = null)
     {
         if ($this->recursive && is_array($value)) {
             $result = array();
@@ -98,5 +98,5 @@ abstract class AbstractFilter
         }
     }
 
-    abstract function filterSingle($value, $valueIdentifier = null);
+    abstract public function filterSingle($value, $valueIdentifier = null);
 }

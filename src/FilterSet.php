@@ -1,8 +1,10 @@
 <?php
+declare(strict_types=1);
 
 namespace Sirius\Filtration;
 
-class FilterSet extends \SplPriorityQueue{
+class FilterSet extends \SplPriorityQueue
+{
     /**
      * Cache of priorities that were already taken
      *
@@ -10,16 +12,21 @@ class FilterSet extends \SplPriorityQueue{
      */
     protected $allocatedPriorities = array();
 
-    function __construct() {
+    public function __construct()
+    {
         $this->setExtractFlags(static::EXTR_BOTH);
     }
 
-    function compare($priority1, $priority2) {
-        if ($priority1 === $priority2) return 0;
+    public function compare($priority1, $priority2)
+    {
+        if ($priority1 === $priority2) {
+            return 0;
+        }
         return $priority1 < $priority2 ? 1 : -1;
     }
 
-    function insert($filter, $priority) {
+    public function insert($filter, $priority)
+    {
         if (!$filter instanceof Filter\AbstractFilter) {
             throw new \InvalidArgumentException('Only filter instances can be added to the filter set');
         }
@@ -40,14 +47,15 @@ class FilterSet extends \SplPriorityQueue{
         return parent::insert($filter, $priority);
     }
 
-    function remove($filter) {
+    public function remove($filter)
+    {
         /* @var $filter \Sirius\Filtration\Filter\AbstractFilter */
         if (!$filter instanceof Filter\AbstractFilter) {
             throw new \InvalidArgumentException('Only filter instances can be removed from the filter set');
         }
         $filters = array();
         $this->top();
-        while($this->valid()) {
+        while ($this->valid()) {
             $item = $this->current();
             /* @var $itemFilter \Sirius\Filtration\Filter\AbstractFilter */
             $itemFilter = $item['data'];
@@ -87,7 +95,8 @@ class FilterSet extends \SplPriorityQueue{
         return $desiredPriority;
     }
 
-    function applyFilters($value, $valueIdentifier = null, $context = null) {
+    public function applyFilters($value, $valueIdentifier = null, $context = null)
+    {
         foreach (clone $this as $filter) {
             /* @var $filter \Sirius\Filtration\Filter\AbstractFilter */
             $filter->setContext($context);
@@ -95,5 +104,4 @@ class FilterSet extends \SplPriorityQueue{
         }
         return $value;
     }
-
 }

@@ -43,16 +43,16 @@ $filtrator->add('content', [
 	'trim'
 ]);
 
-$result = $filtrator->filter(array(
+$result = $filtrator->filter([
 	'title' => '   <h1>My title has tags and is awesome</h1>',
 	'content' => '   My content was trimmed'
-));
+]);
 
 /* $result is
-array(
+[
 	'title' => NULL ,
 	'content' => 'My content was trimmed'
-)
+]
 */
 ```
 
@@ -95,7 +95,7 @@ function myFilter($value, $arg1, $arg2, $arg3) {
     // this is your filter function
 }
 
-$filtrator->add('selector', 'myFilter', array(1, 2, 3));
+$filtrator->add('selector', 'myFilter', [1, 2, 3]);
 ```
 
 The library comes with a list of [built-in filters](docs/filters.md)
@@ -132,20 +132,20 @@ Sometimes the data provided may come in "wrong" shape. For example a date field 
 For this situations you need to transform the data, not 'really' filter it.
 
 ```php
-$data = array(
-    'date_as_array' => array(
+$data = [
+    'date_as_array' => [
         'year' => 2012,
         'month' => 1,
     	'day' => 12
-    )
-);
+    ]
+];
 function convertDateArraysToString ($data, $source, $destination) {
 	$data[$destination] = sprintf('%s-%s-%s', $data[$source]['year'], $data[$source]['month'], $data[$source]['day']);
 	// make sure you return the data back
 	return $data;
 }
 
-$filtrator->add(Filtrator::SELECTOR_ROOT, 'convertDateArraysToString', array('date_as_array', 'date'));
+$filtrator->add(Filtrator::SELECTOR_ROOT, 'convertDateArraysToString', ['date_as_array', 'date']);
 $data = $filtrator->filter($data);
 $data['date'] == '2012-1-12'; // true
 ```
@@ -165,15 +165,15 @@ You may need to retrieve the list of filters for various reasons (eg: you need t
 ```php
 $filters = $filtrator->getFilters();
 // returns an array
-array(
-    'selector' => array(
-        0 => array(
+[
+    'selector' => [
+        0 => [
             'callback' => 'filter_callback',
-            'params' => array(1, 2, 3),
+            'params' => [1, 2, 3],
             'recursive' => true
-        )
-    )
-);
+        ]
+    ]
+];
 ```
 
 ## Caveats
@@ -185,5 +185,5 @@ array(
 $filteredString = $filtrator->filter('single string');
 
 // but you can filter fake it
-$filteredString = $filtrator->filter(array('single_string'))[0];
+$filteredString = $filtrator->filter(['single_string'])[0];
 ```

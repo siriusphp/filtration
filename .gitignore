@@ -7,3 +7,7 @@ docs/.couscous
 docs/couscous.phar
 vendor/
 composer.lock
+couscous.phar
+php-cs-fixer.phar
+phpcbf.phar
+phpcs.phar

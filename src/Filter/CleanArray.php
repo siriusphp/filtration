@@ -1,16 +1,16 @@
 <?php
+declare(strict_types=1);
 namespace Sirius\Filtration\Filter;
 
 class CleanArray extends AbstractFilter
 {
-
     const OPTION_NULLIFY = 'nullify';
 
     protected $options = array(
         self::OPTION_NULLIFY => true
     );
 
-    function filter($value, $valueIdentifier = null)
+    public function filter($value, $valueIdentifier = null)
     {
         if (! is_array($value)) {
             return $value;
@@ -35,7 +35,7 @@ class CleanArray extends AbstractFilter
         return $result;
     }
 
-    function filterSingle($value, $valueIdentifier = null)
+    public function filterSingle($value, $valueIdentifier = null)
     {
         return $this->filter($value, $valueIdentifier);
     }

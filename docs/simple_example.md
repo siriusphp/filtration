@@ -25,7 +25,7 @@ $filtrator->add('*',
 $filtrator->add('title', 'strip_tags');
 
 // strip all but the P, DIV and BR tags from the content
-$filtrator->add('content', 'strip_tags', array('<p><div><br><br/>'));
+$filtrator->add('content', 'strip_tags', ['<p><div><br><br/>']);
 ```
 
 ### Get access to the clean data

@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 namespace Sirius\Filtration\Filter;
 
 class Censor extends AbstractFilter
@@ -32,7 +33,7 @@ class Censor extends AbstractFilter
 
     protected $obfuscator;
 
-    function setOption($name, $value)
+    public function setOption($name, $value)
     {
         parent::setOption($name, $value);
         // reset the obfuscator in case the options are changed during the usage
@@ -46,13 +47,12 @@ class Censor extends AbstractFilter
             $this->obfuscator = new Obfuscate($this->options);
         }
         $obfuscator = $this->obfuscator;
-        return function ($matches) use($obfuscator)
-        {
+        return function ($matches) use ($obfuscator) {
             return $obfuscator->filter($matches[0]);
         };
     }
 
-    function filterSingle($value, $valueIdentifier = null)
+    public function filterSingle($value, $valueIdentifier = null)
     {
         // not a string, move along
         if (! is_string($value)) {

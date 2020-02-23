@@ -2,25 +2,31 @@
 
 namespace Sirius\Filtration\Filter;
 
-use Sirius\Filtration\Filter\Nullify;
+use PHPUnit\Framework\TestCase;
 
-class NullifyTest extends \PHPUnit_Framework_TestCase {
-    
-    function setUp() {
+class NullifyTest extends TestCase
+{
+
+    protected function setUp(): void
+    {
+        parent::setUp();
         $this->filter = new Nullify();
     }
-    
-    function testEmptyString() {
+
+    function testEmptyString()
+    {
         $this->assertTrue(null === $this->filter->filter(''));
     }
 
-    function testZero() {
+    function testZero()
+    {
         $this->assertTrue(null === $this->filter->filter(0));
     }
 
-    function testNotNull() {
+    function testNotNull()
+    {
         $this->assertTrue(123 === $this->filter->filter(123));
         $this->assertTrue('abc' === $this->filter->filter('abc'));
     }
-    
+
 }

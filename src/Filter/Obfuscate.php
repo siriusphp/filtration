@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 namespace Sirius\Filtration\Filter;
 
 class Obfuscate extends AbstractFilter
@@ -16,7 +17,7 @@ class Obfuscate extends AbstractFilter
         self::OPTION_REPLACEMENT_CHAR => '*'
     );
 
-    function filterSingle($value, $valueIdentifier = null)
+    public function filterSingle($value, $valueIdentifier = null)
     {
         // not a string, move along
         if (! is_string($value)) {
@@ -24,9 +25,16 @@ class Obfuscate extends AbstractFilter
         }
         
         $len = strlen($value);
-        $start = $this->options[self::OPTION_START_CHARACTERS] ? substr($value, 0, $this->options[self::OPTION_START_CHARACTERS]) : '';
-        $end = $this->options[self::OPTION_END_CHARACTERS] ? substr($value, $len - $this->options[self::OPTION_END_CHARACTERS]) : '';
-        $middle = str_repeat($this->options[self::OPTION_REPLACEMENT_CHAR], $len - $this->options[self::OPTION_START_CHARACTERS] - $this->options[self::OPTION_END_CHARACTERS]);
+        $start = $this->options[self::OPTION_START_CHARACTERS] ?
+            substr($value, 0, $this->options[self::OPTION_START_CHARACTERS]) :
+            '';
+        $end = $this->options[self::OPTION_END_CHARACTERS] ?
+            substr($value, $len - $this->options[self::OPTION_END_CHARACTERS]) :
+            '';
+        $middle = str_repeat(
+            $this->options[self::OPTION_REPLACEMENT_CHAR],
+            $len - $this->options[self::OPTION_START_CHARACTERS] - $this->options[self::OPTION_END_CHARACTERS]
+        );
         return $start . $middle . $end;
     }
 }

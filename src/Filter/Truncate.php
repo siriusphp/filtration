@@ -1,9 +1,9 @@
 <?php
+declare(strict_types=1);
 namespace Sirius\Filtration\Filter;
 
 class Truncate extends AbstractFilter
 {
-
     const OPTION_LIMIT = 'limit';
 
     const OPTION_ELLIPSIS = 'ellipsis';
@@ -16,7 +16,7 @@ class Truncate extends AbstractFilter
         self::OPTION_ELLIPSIS => '...'
     );
 
-    function filterSingle($value, $valueIdentifier = null)
+    public function filterSingle($value, $valueIdentifier = null)
     {
         // not a string, move along
         if (! is_string($value)) {
@@ -27,7 +27,7 @@ class Truncate extends AbstractFilter
             return $value;
         }
 
-        $limit = $this->options[self::OPTION_LIMIT];
+        $limit = (int) $this->options[self::OPTION_LIMIT];
         $firstSpace = strpos($value, ' ');
 
         // in case word breaking is not allowed find the previous space

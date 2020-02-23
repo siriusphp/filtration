@@ -1,9 +1,9 @@
 <?php
+declare(strict_types=1);
 namespace Sirius\Filtration\Filter;
 
 class NormalizeNumber extends AbstractFilter
 {
-
     const OPTION_THOUSANDS_SEPARATOR = 'thousands_separator';
 
     const OPTION_DECIMAL_POINT = 'decimal_point';
@@ -17,7 +17,7 @@ class NormalizeNumber extends AbstractFilter
         self::OPTION_DECIMAL_POINT => self::VALUE_COMMA
     );
 
-    function filterSingle($value, $valueIdentifier = null)
+    public function filterSingle($value, $valueIdentifier = null)
     {
         $value = (string) $value;
         // number is already normalized

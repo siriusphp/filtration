@@ -2,20 +2,25 @@
 
 namespace Sirius\Filtration\Filter;
 
-use Sirius\Filtration\Filter\NormalizeNumber;
+use PHPUnit\Framework\TestCase;
 
-class NormalizeNumberTest extends \PHPUnit_Framework_TestCase {
-    
-    function setUp() {
+class NormalizeNumberTest extends TestCase
+{
+
+    protected function setUp(): void
+    {
+        parent::setUp();
         $this->filter = new NormalizeNumber();
     }
-    
-    function testDefaultOptions() {
+
+    function testDefaultOptions()
+    {
         $this->assertEquals(12345.67, $this->filter->filter('12.345,67'));
         $this->assertEquals(12345.67, $this->filter->filter('12 345,67'));
     }
 
-    function testAlreadyNormalizedNumbers() {
+    function testAlreadyNormalizedNumbers()
+    {
         $this->assertEquals(12345.67, $this->filter->filter('12345.67'));
     }
 }

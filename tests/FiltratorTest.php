@@ -1,7 +1,8 @@
 <?php
+
 namespace Sirius\Filtration;
 
-use Sirius\Filtration\Filtrator;
+use PHPUnit\Framework\TestCase;
 
 function postFiltrationFunction($value)
 {
@@ -13,26 +14,28 @@ function preFiltrationFunction($value)
     return 'pre.' . $value;
 }
 
-class FakeFilter extends Filter\AbstractFilter {
+class FakeFilter extends Filter\AbstractFilter
+{
 
-    function filterSingle($value, $valueIdentifier = null) {
+    function filterSingle($value, $valueIdentifier = null)
+    {
         return 'fake';
     }
 }
 
-class FiltratorTest extends \PHPUnit_Framework_TestCase
+class FiltratorTest extends TestCase
 {
 
-    function setUp()
+    protected function setUp(): void
     {
         $this->filterFactory = new FilterFactory();
-        $this->filtrator = new Filtrator($this->filterFactory);
-        $this->sampleData = array(
+        $this->filtrator     = new Filtrator($this->filterFactory);
+        $this->sampleData    = array(
             'whitespace' => '   some string   ',
-            'html' => '   <strong><em>html</em></strong>',
-            'array' => array(
+            'html'       => '   <strong><em>html</em></strong>',
+            'array'      => array(
                 'whitespace' => '   some string   ',
-                'array' => array(
+                'array'      => array(
                     'whitespace' => '  some string   '
                 )
             )
@@ -41,9 +44,9 @@ class FiltratorTest extends \PHPUnit_Framework_TestCase
 
     function testRootFilters()
     {
-        $this->filtrator->add('/', function ($value)
-        {
+        $this->filtrator->add('/', function ($value) {
             $value['text'] = trim(strip_tags($value['html']));
+
             return $value;
         });
         $filtered = $this->filtrator->filter($this->sampleData);
@@ -77,8 +80,8 @@ class FiltratorTest extends \PHPUnit_Framework_TestCase
     function testFilterPriority()
     {
         $this->filtrator->add('whitespace', 'StringTrim')
-            ->add('whitespace', __NAMESPACE__ . '\postFiltrationFunction', null, false, - 1)
-            ->add('whitespace', __NAMESPACE__ . '\preFiltrationFunction', null, false, - 1);
+                        ->add('whitespace', __NAMESPACE__ . '\postFiltrationFunction', null, false, -1)
+                        ->add('whitespace', __NAMESPACE__ . '\preFiltrationFunction', null, false, -1);
         $filtered = $this->filtrator->filter($this->sampleData);
         $this->assertEquals('pre.   some string   .post', $filtered['whitespace']);
     }
@@ -103,13 +106,13 @@ class FiltratorTest extends \PHPUnit_Framework_TestCase
 
     function testExceptionThrownForUncallableFilters()
     {
-        $this->setExpectedException('\InvalidArgumentException');
+        $this->expectException('\InvalidArgumentException');
         $this->filtrator->add('*', 'hopefully_this_is_not_a_valid_function');
     }
 
     function testExceptionThrownForInvalidFilterOptions()
     {
-        $this->setExpectedException('\InvalidArgumentException');
+        $this->expectException('\InvalidArgumentException');
         $this->filtrator->add('*', 'StringTrim', new \stdClass());
     }
 
@@ -124,16 +127,18 @@ class FiltratorTest extends \PHPUnit_Framework_TestCase
         )));
     }
 
-    function testCustomFilterClass() {
+    function testCustomFilterClass()
+    {
         $this->filtrator->add('real', '\Sirius\Filtration\FakeFilter');
         $this->assertEquals(array(
-        	'real' => 'fake'
+            'real' => 'fake'
         ), $this->filtrator->filter(array(
-        	'real' => 'real'
+            'real' => 'real'
         )));
     }
 
-    function testAddingObjectsAsFilters() {
+    function testAddingObjectsAsFilters()
+    {
         $this->filtrator->add('trim', new \Sirius\Filtration\Filter\StringTrim());
         $this->assertEquals(array(
             'trim' => 'abc',
@@ -142,13 +147,15 @@ class FiltratorTest extends \PHPUnit_Framework_TestCase
         )));
     }
 
-    function testExceptionThrownIfFilterCannotBeConstructed() {
-        $this->setExpectedException('\InvalidArgumentException');
+    function testExceptionThrownIfFilterCannotBeConstructed()
+    {
+        $this->expectException('\InvalidArgumentException');
         $this->filtrator->add('trim', new \stdClass());
     }
 
-    function testFilteringNonArrays() {
-        $obj = new \stdClass();
+    function testFilteringNonArrays()
+    {
+        $obj      = new \stdClass();
         $obj->key = 'value';
         $this->assertEquals($obj, $this->filtrator->filter($obj));
     }
@@ -160,7 +167,8 @@ class FiltratorTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(array(), $this->filtrator->getFilters());
     }
 
-    function testRemovingObjectsAsFilters() {
+    function testRemovingObjectsAsFilters()
+    {
         $this->filtrator->add('trim', new \Sirius\Filtration\Filter\StringTrim());
         $this->filtrator->remove('trim', new \Sirius\Filtration\Filter\StringTrim());
         $this->assertEquals(array(
@@ -170,53 +178,58 @@ class FiltratorTest extends \PHPUnit_Framework_TestCase
         )));
     }
 
-    function testFilterOptions() {
+    function testFilterOptions()
+    {
         $this->filtrator->add('text', 'stringtrim', '{"side": "right"}');
         $this->filtrator->add('another_text', 'stringtrim', "side=left");
         $this->assertEquals(array(
-        	'text' => '  abc',
+            'text'         => '  abc',
             'another_text' => 'abc   '
         ), $this->filtrator->filter(array(
-        	'text' => '  abc   ',
-            'another_text'=> '   abc   '
+            'text'         => '  abc   ',
+            'another_text' => '   abc   '
         )));
     }
 
-    function testExceptionThrownOnInvalidSelector() {
-        $this->setExpectedException('\InvalidArgumentException');
+    function testExceptionThrownOnInvalidSelector()
+    {
+        $this->expectException('\InvalidArgumentException');
         $this->filtrator->add(new \stdClass());
     }
 
-    function testAddingMultipleRulesAtOnce() {
+    function testAddingMultipleRulesAtOnce()
+    {
         $this->filtrator->add(array(
-        	'text' => array(array('stringtrim', '{"side": "right"}')),
+            'text'         => array(array('stringtrim', '{"side": "right"}')),
             'another_text' => array(array('stringtrim', 'side=left'))
         ));
         $this->assertEquals(array(
-            'text' => '  abc',
+            'text'         => '  abc',
             'another_text' => 'abc   '
         ), $this->filtrator->filter(array(
-            'text' => '  abc   ',
-            'another_text'=> '   abc   '
+            'text'         => '  abc   ',
+            'another_text' => '   abc   '
         )));
     }
 
-    function testAddingMultipleRulesAsArrayPerSelectorAtOnce() {
+    function testAddingMultipleRulesAsArrayPerSelectorAtOnce()
+    {
         $this->filtrator->add('text', array('stringtrim', 'truncate(limit=10)(true)(10)'));
         $this->assertEquals(array(
-        	'text' => 'A text tha...'
+            'text' => 'A text tha...'
         ), $this->filtrator->filter(array(
-        	'text' => '     A text that is more than 10 characters long'
+            'text' => '     A text that is more than 10 characters long'
         )));
     }
 
 
-    function testAddingMultipleRulesAsStringPerSelectorAtOnce() {
+    function testAddingMultipleRulesAsStringPerSelectorAtOnce()
+    {
         $this->filtrator->add('text', 'stringtrim | truncate(limit=10)(true)(10)');
         $this->assertEquals(array(
-        	'text' => 'A text tha...'
+            'text' => 'A text tha...'
         ), $this->filtrator->filter(array(
-        	'text' => '     A text that is more than 10 characters long'
+            'text' => '     A text that is more than 10 characters long'
         )));
     }
 

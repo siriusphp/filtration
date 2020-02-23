@@ -1,6 +1,6 @@
 <?php
+declare(strict_types=1);
 namespace Sirius\Filtration;
-
 
 class Filtrator implements FiltratorInterface
 {
@@ -19,7 +19,7 @@ class Filtrator implements FiltratorInterface
      */
     protected $filters = array();
 
-    function __construct(FilterFactory $filterFactory = null)
+    public function __construct(FilterFactory $filterFactory = null)
     {
         if (!$filterFactory) {
             $filterFactory = new FilterFactory();
@@ -51,11 +51,11 @@ class Filtrator implements FiltratorInterface
      * @param bool $recursive
      * @param integer $priority
      * @throws \InvalidArgumentException
-     * @internal param $ callable|filter class name|\Sirius\Filtration\Filter\AbstractFilter $callbackOrFilterName*            callable|filter class name|\Sirius\Filtration\Filter\AbstractFilter $callbackOrFilterName
+     * @internal param $ callable|filter class name|\Sirius\Filtration\Filter\AbstractFilter $callbackOrFilterName
      * @internal param array|string $params
      * @return self
      */
-    function add($selector, $callbackOrFilterName = null, $options = null, $recursive = false, $priority = 0)
+    public function add($selector, $callbackOrFilterName = null, $options = null, $recursive = false, $priority = 0)
     {
         /**
          * $selector is actually an array with filters
@@ -84,7 +84,7 @@ class Filtrator implements FiltratorInterface
             }
             // rule was supplied like this 'trim(limit=10)(true)(10)'
             if (strpos($callbackOrFilterName, '(') !== false) {
-                list ($callbackOrFilterName, $options, $recursive, $priority) = $this->parseRule($callbackOrFilterName);
+                list($callbackOrFilterName, $options, $recursive, $priority) = $this->parseRule($callbackOrFilterName);
             }
         }
 
@@ -180,7 +180,7 @@ class Filtrator implements FiltratorInterface
      * @throws \InvalidArgumentException
      * @return \Sirius\Filtration\Filtrator
      */
-    function remove($selector, $callbackOrName = true)
+    public function remove($selector, $callbackOrName = true)
     {
         if (array_key_exists($selector, $this->filters)) {
             if ($callbackOrName === true) {
@@ -204,7 +204,7 @@ class Filtrator implements FiltratorInterface
      *
      * @return array
      */
-    function getFilters()
+    public function getFilters()
     {
         return $this->filters;
     }
@@ -215,7 +215,7 @@ class Filtrator implements FiltratorInterface
      * @param array $data
      * @return array
      */
-    function filter($data = array())
+    public function filter($data = array())
     {
         if (! is_array($data)) {
             return $data;
@@ -239,7 +239,7 @@ class Filtrator implements FiltratorInterface
      * @param string $valueIdentifier
      * @return mixed
      */
-    function filterItem($data, $valueIdentifier)
+    public function filterItem($data, $valueIdentifier)
     {
         $value = Utils::arrayGetByPath($data, $valueIdentifier);
         $value = $this->applyFilters($value, $valueIdentifier, $data);
@@ -261,7 +261,7 @@ class Filtrator implements FiltratorInterface
      * @param mixed $context
      * @return mixed
      */
-    function applyFilters($value, $valueIdentifier, $context)
+    public function applyFilters($value, $valueIdentifier, $context)
     {
         foreach ($this->filters as $selector => $filterSet) {
             /* @var $filterSet FilterSet */
@@ -296,6 +296,6 @@ class Filtrator implements FiltratorInterface
             '\[',
             '\]'
         ), $selector)) . '/';
-        return preg_match($regex, $item);
+        return preg_match($regex, (string) $item);
     }
 }

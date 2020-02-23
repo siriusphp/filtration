@@ -2,26 +2,32 @@
 
 namespace Sirius\Filtration\Filter;
 
-use Sirius\Filtration\Filter\Double;
+use PHPUnit\Framework\TestCase;
 
-class DoubleTest extends \PHPUnit_Framework_TestCase {
-    
-    function setUp() {
+class DoubleTest extends TestCase
+{
+
+    protected function setUp(): void
+    {
+        parent::setUp();
         $this->filter = new Double();
     }
-    
-    function testFilter() {
+
+    function testFilter()
+    {
         $this->filter->setOption(Double::OPTION_PRECISION, 3);
         $this->assertEquals(1234, $this->filter->filter(1234.0001));
         $this->assertEquals(1234.001, $this->filter->filter(1234.0012));
     }
 
-    function testObject() {
+    function testObject()
+    {
         $obj = new \stdClass();
         $this->assertEquals($obj, $this->filter->filter($obj));
     }
 
-    function testZero() {
+    function testZero()
+    {
         $this->assertEquals(0, $this->filter->filter('0'));
     }
 }

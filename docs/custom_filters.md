@@ -30,14 +30,14 @@ use Sirius\Filtration\Filtrator;
 $filtrator = new Filtrator();
 $filtrator->add('content', 'MyApp\Filtration\Filter\AppendUnderscores');
 
-$result = $filtrator->filter(array(
+$result = $filtrator->filter([
     'append_underscores' => 10,
     'content' => 'Pretty stupid, right?'
-));
+]);
 
 // $result will be
-// array(
+// [
 //    'append_underscores' => 10,
 //    'content' => '_________Pretty stupid, right?'
-// )
+// ]
 ```

@@ -1,9 +1,9 @@
 <?php
+declare(strict_types=1);
 namespace Sirius\Filtration\Filter;
 
 class Nullify extends AbstractFilter
 {
-
     const OPTION_EMPTY_STRING = 'empty_string';
 
     const OPTION_ZERO = 'zero';
@@ -13,7 +13,7 @@ class Nullify extends AbstractFilter
         self::OPTION_ZERO => true
     );
 
-    function filterSingle($value, $valueIdentifier = null)
+    public function filterSingle($value, $valueIdentifier = null)
     {
         if (is_string($value) && $value == '' && $this->options['empty_string']) {
             return null;

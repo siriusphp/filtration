@@ -19,7 +19,7 @@ $filtrator->add('name', 'stringtrim(side=both)');
 $filtrator->add('paragraphs', 'stringrim({"side":"both"})(true)(10)');
 
 // the above example is similar to
-$filtrator->add('name', 'stringtrim', array('side' => 'both'), true, 10);
+$filtrator->add('name', 'stringtrim', ['side' => 'both'], true, 10);
 ```
 
 **Important!** You cannot have something like `(this)` inside the JSON or query string.
@@ -36,19 +36,18 @@ $filtrator->add('name', 'stringtrim(side=both) | nullify');
 $filtrator->add(
     // add the label after the selector so you don't have to pass the label to every rule
     'name', 
-    array(
+    [
         'stringtrim',
         'nullify'
-    )
+    ]
 );
 ```
 
 ##### 5. Add multiple rules on multiple selectors
 Mix and match everthing from above
 ```php
-$filtrator->add(array(
+$filtrator->add([
     'title' => 'stringtrim | strip_tags | nullify',
-    'content' => 'stringtrim | nullify'),
-    )
-));
+    'content' => 'stringtrim | nullify',
+]);
 ```

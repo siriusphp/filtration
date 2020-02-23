@@ -35,7 +35,7 @@ somewhere in your app
 $article = ArticleTable::getById(10);
 $filtrator = new Sirius\Filtration\Filtrator;
 $filtrator->add('title', 'ucwords');
-$filtrator->add('title', 'truncate', array('length' => 15));
+$filtrator->add('title', 'truncate', ['length' => 15]);
 
 $articleWrapper = new ArticleWrapper($article, $filtrator);
 ```
