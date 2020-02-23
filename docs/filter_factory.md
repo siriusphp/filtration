@@ -1,5 +1,5 @@
 ---
-title: The filter factory
+title: The filter factory | Sirius PHP Filter
 ---
 
 # The filter factory

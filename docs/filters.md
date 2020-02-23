@@ -1,4 +1,8 @@
-#Built-in filters
+---
+title: Built-in filters | Sirius PHP Filter
+---
+
+# Built-in filters
 
 ## Callback
 

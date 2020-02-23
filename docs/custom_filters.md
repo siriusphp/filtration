@@ -1,5 +1,5 @@
 ---
-title: Custom filters
+title: Custom filters | Sirius PHP Filter
 ---
 
 # Custom filters

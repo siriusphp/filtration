@@ -1,5 +1,5 @@
 ---
-title: Syntactic sugar
+title: Special selectors | Sirius PHP Filter
 ---
 
 # Special data selectors

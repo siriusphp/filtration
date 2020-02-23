@@ -1,5 +1,5 @@
 ---
-title: Installating Sirius\Filtration
+title: Installation | Sirius PHP Filter
 ---
 
 #Installation

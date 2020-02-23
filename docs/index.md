@@ -1,4 +1,6 @@
-Sirius Filtration
+---
+title: Sirius PHP Filter library
+---
 
 [![Source Code](http://img.shields.io/badge/source-siriusphp/filtration-blue.svg?style=flat-square)](https://github.com/siriusphp/filtration)
 [![Latest Version](https://img.shields.io/packagist/v/siriusphp/filtration.svg?style=flat-square)](https://github.com/siriusphp/filtration/releases)

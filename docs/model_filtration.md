@@ -1,5 +1,5 @@
 ---
-title: Using Sirius\Filtration for models
+title: Using filters for models  | Sirius PHP Filter
 ---
 
 # Filtration for your models

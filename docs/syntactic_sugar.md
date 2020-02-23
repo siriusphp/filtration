@@ -1,5 +1,5 @@
 ---
-title: Syntactic sugar
+title: Syntactic sugar | Sirius PHP Filter
 ---
 
 # Syntactic sugar

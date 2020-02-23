@@ -1,5 +1,5 @@
 ---
-title: Simple filtration example
+title: Simple filter example | Sirius PHP Filter
 ---
 
 # Simple example

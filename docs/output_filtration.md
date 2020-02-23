@@ -1,5 +1,5 @@
 ---
-title: Using Sirius\Filtration for output
+title: Filtering output | Sirius PHP Filter
 ---
 
 # Output filtering
