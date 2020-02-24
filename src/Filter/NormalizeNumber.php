@@ -12,12 +12,12 @@ class NormalizeNumber extends AbstractFilter
 
     const VALUE_COMMA = ',';
 
-    protected $options = array(
+    protected $options = [
         self::OPTION_THOUSANDS_SEPARATOR => self::VALUE_POINT,
         self::OPTION_DECIMAL_POINT => self::VALUE_COMMA
-    );
+    ];
 
-    public function filterSingle($value, $valueIdentifier = null)
+    public function filterSingle($value, string $valueIdentifier = null)
     {
         $value = (string) $value;
         // number is already normalized

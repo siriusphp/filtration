@@ -17,7 +17,7 @@ class Filtrator implements FiltratorInterface
      *
      * @var array
      */
-    protected $filters = array();
+    protected $filters = [];
 
     /**
      * @var array
@@ -50,14 +50,14 @@ class Filtrator implements FiltratorInterface
      *          // anonymous function
      *          $filtrator->add('title', function($value){ return $value . '!!!'; });
      *          // filter class from the library registered on the $filtersMap
-     *          $filtrator->add('title', 'normalizedate', array('format' => 'm/d/Y'));
+     *          $filtrator->add('title', 'normalizedate', ['format' => 'm/d/Y']);
      *          // custom class
      *          $filtrator->add('title', '\MyApp\Filters\CustomFilter');
      *          // multiple filters as once with different ways to pass options
-     *          $filtrator->add('title', array(
-     *          array('truncate', 'limit=10', true, 10),
-     *          array('censor', array('words' => array('faggy', 'idiot'))
-     *          ));
+     *          $filtrator->add('title', [
+     *              ['truncate', 'limit=10', true, 10],
+     *              ['censor', ['words' => ['idiot']]
+     *          ]);
      *          // multiple fitlers as a single string
      *          $filtrator->add('title', 'stringtrim(side=left)(true)(10) | truncate(limit=100)');
      * @param string|array $selector
@@ -75,10 +75,10 @@ class Filtrator implements FiltratorInterface
         /**
          * $selector is actually an array with filters
          *
-         * @example $filtrator->add(array(
-         *          'title' => array('trim', array('truncate', '{"limit":100}'))
-         *          'description' => array('trim')
-         *          ));
+         * @example $filtrator->add([
+         *              'title' => ['trim', ['truncate', '{"limit":100}']]
+         *              'description' => ['trim']
+         *          ]);
          */
         if (is_array($selector)) {
             foreach ($selector as $key => $filters) {
@@ -106,21 +106,16 @@ class Filtrator implements FiltratorInterface
         /**
          * The $callbackOrFilterName is an array of filters
          *
-         * @example $filtrator->add('title', array(
+         * @example $filtrator->add('title', [
          *          'trim',
-         *          array('truncate', '{"limit":100}')
-         *          ));
+         *          ['truncate', '{"limit":100}']
+         *      ]);
          */
         if (is_array($callbackOrFilterName) && ! is_callable($callbackOrFilterName)) {
             foreach ($callbackOrFilterName as $filter) {
-                // $filter is something like array('truncate', '{"limit":100}')
+                // $filter is something like ['truncate', '{"limit":100}']
                 if (is_array($filter) && ! is_callable($filter)) {
-                    $args = $filter;
-                    array_unshift($args, $selector);
-                    call_user_func_array(array(
-                        $this,
-                        'add'
-                    ), $args);
+                    $this->add($selector, ...$filter);
                 } elseif (is_string($filter) || is_callable($filter)) {
                     $this->add($selector, $filter);
                 }
@@ -147,12 +142,12 @@ class Filtrator implements FiltratorInterface
      *
      *          will be converted into
      *
-     *          array(
+     *          [
      *          'minLength', // validator name
-     *          array('min' => 2'), // validator options
+     *          ['min' => 2'], // validator options
      *          true, // recursive
      *          10 // priority
-     *          )
+     *          ]
      * @param string $ruleAsString
      * @return array
      */
@@ -160,13 +155,13 @@ class Filtrator implements FiltratorInterface
     {
         $ruleAsString = trim($ruleAsString);
 
-        $options = array();
+        $options = [];
         $recursive = false;
         $priority = 0;
 
         $name = substr($ruleAsString, 0, strpos($ruleAsString, '('));
         $ruleAsString = substr($ruleAsString, strpos($ruleAsString, '('));
-        $matches = array();
+        $matches = [];
         preg_match_all('/\(([^\)]*)\)/', $ruleAsString, $matches);
 
         if (isset($matches[1])) {
@@ -181,12 +176,12 @@ class Filtrator implements FiltratorInterface
             }
         }
 
-        return array(
+        return [
             $name,
             $options,
             $recursive,
             $priority
-        );
+        ];
     }
 
     /**
@@ -234,12 +229,8 @@ class Filtrator implements FiltratorInterface
      * @param array $data
      * @return array
      */
-    public function filter($data = array())
+    public function filter(array $data = [])
     {
-        if (! is_array($data)) {
-            return $data;
-        }
-
         // first apply the filters to the ROOT
         if (isset($this->filters[self::SELECTOR_ROOT])) {
             /* @var $rootFilters FilterSet */

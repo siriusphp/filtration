@@ -8,12 +8,12 @@ class Nullify extends AbstractFilter
 
     const OPTION_ZERO = 'zero';
 
-    protected $options = array(
+    protected $options = [
         self::OPTION_EMPTY_STRING => true,
         self::OPTION_ZERO => true
-    );
+    ];
 
-    public function filterSingle($value, $valueIdentifier = null)
+    public function filterSingle($value, string $valueIdentifier = null)
     {
         if (is_string($value) && $value == '' && $this->options['empty_string']) {
             return null;

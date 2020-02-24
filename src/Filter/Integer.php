@@ -4,7 +4,7 @@ namespace Sirius\Filtration\Filter;
 
 class Integer extends AbstractFilter
 {
-    public function filterSingle($value, $valueIdentifier = null)
+    public function filterSingle($value, string $valueIdentifier = null)
     {
         if (is_object($value)) {
             return $value;

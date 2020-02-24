@@ -11,13 +11,13 @@ class Obfuscate extends AbstractFilter
     // replacement character
     const OPTION_REPLACEMENT_CHAR = 'replacement_char';
 
-    protected $options = array(
+    protected $options = [
         self::OPTION_START_CHARACTERS => 0,
         self::OPTION_END_CHARACTERS => 0,
         self::OPTION_REPLACEMENT_CHAR => '*'
-    );
+    ];
 
-    public function filterSingle($value, $valueIdentifier = null)
+    public function filterSingle($value, string $valueIdentifier = null)
     {
         // not a string, move along
         if (! is_string($value)) {

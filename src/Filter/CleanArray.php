@@ -6,16 +6,16 @@ class CleanArray extends AbstractFilter
 {
     const OPTION_NULLIFY = 'nullify';
 
-    protected $options = array(
+    protected $options = [
         self::OPTION_NULLIFY => true
-    );
+    ];
 
-    public function filter($value, $valueIdentifier = null)
+    public function filter($value, string $valueIdentifier = null)
     {
         if (! is_array($value)) {
             return $value;
         }
-        $result = array();
+        $result = [];
         if ($this->options['nullify']) {
             $nullifier = new Nullify();
         }
@@ -35,7 +35,7 @@ class CleanArray extends AbstractFilter
         return $result;
     }
 
-    public function filterSingle($value, $valueIdentifier = null)
+    public function filterSingle($value, string $valueIdentifier = null)
     {
         return $this->filter($value, $valueIdentifier);
     }

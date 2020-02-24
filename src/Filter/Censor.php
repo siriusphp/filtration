@@ -13,11 +13,11 @@ class Censor extends AbstractFilter
     // censored words
     const OPTION_WORDS = 'words';
 
-    protected $options = array(
+    protected $options = [
         self::OPTION_START_CHARACTERS => 1,
         self::OPTION_END_CHARACTERS => 1,
         self::OPTION_REPLACEMENT_CHAR => '*',
-        self::OPTION_WORDS => array(
+        self::OPTION_WORDS => [
             'fuck',
             'fucker',
             'fuckers',
@@ -25,11 +25,9 @@ class Censor extends AbstractFilter
             'motherfucker',
             'asshole',
             'cunt',
-            'dick',
-            'nigger',
-            'faggot'
-        )
-    );
+            'dick'
+        ]
+    ];
 
     protected $obfuscator;
 
@@ -52,7 +50,7 @@ class Censor extends AbstractFilter
         };
     }
 
-    public function filterSingle($value, $valueIdentifier = null)
+    public function filterSingle($value, string $valueIdentifier = null)
     {
         // not a string, move along
         if (! is_string($value)) {

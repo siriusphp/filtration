@@ -8,7 +8,7 @@ use Sirius\Filtration\Filter\Callback;
 
 class FilterFactory
 {
-    protected $filtersMap = array(
+    protected $filtersMap = [
         'callback' => '\Sirius\Filtration\Filter\Callback',
         'censor' => '\Sirius\Filtration\Filter\Censor',
         'cleanarray' => '\Sirius\Filtration\Filter\CleanArray',
@@ -21,7 +21,7 @@ class FilterFactory
         'stringtrim' => '\Sirius\Filtration\Filter\StringTrim',
         'trim' => '\Sirius\Filtration\Filter\StringTrim',
         'truncate' => '\Sirius\Filtration\Filter\Truncate'
-    );
+    ];
 
     public function registerFilter($name, $class)
     {
@@ -41,14 +41,16 @@ class FilterFactory
      * @throws \InvalidArgumentException
      * @return AbstractFilter
      */
-    public function createFilter($callbackOrFilterName, $options = null, $resursive = false)
+    public function createFilter($callbackOrFilterName, $options = null, $resursive = false): AbstractFilter
     {
         if (is_callable($callbackOrFilterName)) {
-            $filter = new Callback(array(
+            return new Callback([
                 'callback' => $callbackOrFilterName,
                 'arguments' => $options
-            ), $resursive);
-        } elseif (is_string($callbackOrFilterName)) {
+            ], $resursive);
+        }
+
+        if (is_string($callbackOrFilterName)) {
             if (class_exists('\Sirius\Filtration\Filter\\' . $callbackOrFilterName)) {
                 $callbackOrFilterName = '\Sirius\Filtration\Filter\\' . $callbackOrFilterName;
             }
@@ -56,20 +58,21 @@ class FilterFactory
             if (isset($this->filtersMap[strtolower($callbackOrFilterName)])) {
                 $callbackOrFilterName = $this->filtersMap[strtolower($callbackOrFilterName)];
             }
+
             if (class_exists($callbackOrFilterName) && is_subclass_of($callbackOrFilterName, AbstractFilter::class)) {
-                $filter = new $callbackOrFilterName($options, $resursive);
+                return new $callbackOrFilterName($options, $resursive);
             } else {
                 throw new \InvalidArgumentException(sprintf(
                     'Impossible to determine the filter based on the name %s',
                     (string) $callbackOrFilterName
                 ));
             }
-        } elseif (is_object($callbackOrFilterName) && $callbackOrFilterName instanceof AbstractFilter) {
-            $filter = $callbackOrFilterName;
         }
-        if (! isset($filter)) {
-            throw new \InvalidArgumentException('Invalid value for the $callbackorFilterName parameter');
+
+        if (is_object($callbackOrFilterName) && $callbackOrFilterName instanceof AbstractFilter) {
+            return $callbackOrFilterName;
         }
-        return $filter;
+
+        throw new \InvalidArgumentException('Invalid value for the $callbackorFilterName parameter');
     }
 }

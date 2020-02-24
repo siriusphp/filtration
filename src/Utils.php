@@ -8,13 +8,13 @@ class Utils
     {
         $firstOpen = strpos((string) $selector, '[');
         if ($firstOpen === false) {
-            return array($selector, '');
+            return [$selector, ''];
         }
         $firstClose = strpos($selector, ']');
         $container = substr($selector, 0, $firstOpen);
         $subselector = substr($selector, $firstOpen + 1, $firstClose - $firstOpen - 1)
                        . substr($selector, $firstClose + 1);
-        return array($container, $subselector);
+        return [$container, $subselector];
     }
 
     /**
@@ -44,13 +44,13 @@ class Utils
         if (strpos($selector, '*') === false) {
             return $item === $selector;
         }
-        $regex = '/' . str_replace('*', '[^\]]+', str_replace(array(
+        $regex = '/' . str_replace('*', '[^\]]+', str_replace([
                 '[',
                 ']'
-            ), array(
+            ], [
                 '\[',
                 '\]'
-            ), $selector)) . '/';
+            ], $selector)) . '/';
         return preg_match($regex, (string) $item);
     }
 }

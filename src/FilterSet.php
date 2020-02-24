@@ -12,7 +12,7 @@ class FilterSet extends \SplPriorityQueue
      *
      * @var array
      */
-    protected $allocatedPriorities = array();
+    protected $allocatedPriorities = [];
 
     public function __construct()
     {
@@ -32,20 +32,7 @@ class FilterSet extends \SplPriorityQueue
         if (!$filter instanceof Filter\AbstractFilter) {
             throw new \InvalidArgumentException('Only filter instances can be added to the filter set');
         }
-        $priority = $this->getValidPriority($priority);
-        // verify if the filter is already in the queue
-        if ($this->isEmpty()) {
-            array_push($this->allocatedPriorities, $priority);
-            return parent::insert($filter, $priority);
-        }
-        // use `clone` because iterating over Priority Queues removes elements from the queue
-        foreach (clone $this as $v) {
-            /* @var $v AbstractFilterAlias */
-            if ($v->getUniqueId() === $filter->getUniqueId()) {
-                return;
-            }
-        }
-        array_push($this->allocatedPriorities, $priority);
+        $this->allocatedPriorities[] =  $this->getValidPriority($priority);
         return parent::insert($filter, $priority);
     }
 
@@ -55,7 +42,7 @@ class FilterSet extends \SplPriorityQueue
         if (!$filter instanceof Filter\AbstractFilter) {
             throw new \InvalidArgumentException('Only filter instances can be removed from the filter set');
         }
-        $filters = array();
+        $filters = [];
         $this->top();
         while ($this->valid()) {
             $item = $this->current();
@@ -102,7 +89,7 @@ class FilterSet extends \SplPriorityQueue
         foreach (clone $this as $filter) {
             /* @var $filter AbstractFilterAlias */
             $filter->setContext($context);
-            $value = $filter->filter($value, $valueIdentifier);
+            $value = $filter->filter($value, (string) $valueIdentifier);
         }
         return $value;
     }

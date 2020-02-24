@@ -6,11 +6,11 @@ abstract class AbstractFilter
 {
     protected $recursive = true;
 
-    protected $options = array();
+    protected $options = [];
 
     protected $context;
 
-    public function __construct($options = array(), $recursive = true)
+    public function __construct($options = [], $recursive = true)
     {
         $options = $this->normalizeOptions($options);
         if (is_array($options) && ! empty($options)) {
@@ -32,7 +32,7 @@ abstract class AbstractFilter
                 $options = $output;
             }
         } elseif (! $options) {
-            $options = array();
+            $options = [];
         }
 
         if (! is_array($options)) {
@@ -49,9 +49,9 @@ abstract class AbstractFilter
      *
      * @return string
      */
-    public function getUniqueId()
+    public function getUniqueId(): string
     {
-        return get_called_class() . '|' . json_encode(ksort($this->options));
+        return __CLASS__ . '|' . json_encode(ksort($this->options));
     }
 
     /**
@@ -69,28 +69,19 @@ abstract class AbstractFilter
         return $this;
     }
 
-    /**
-     * The context of the validator can be used when the validator depends on other values
-     * that are not known at the moment the validator is constructed
-     * For example, when you need to validate an email field matches another email field,
-     * to confirm the email address
-     *
-     * @param array|object $context
-     * @return self
-     */
     public function setContext($context)
     {
         $this->context = $context;
         return $this;
     }
 
-    public function filter($value, $valueIdentifier = null)
+    public function filter($value, string $valueIdentifier = null)
     {
         if ($this->recursive && is_array($value)) {
-            $result = array();
+            $result = [];
             foreach ($value as $k => $v) {
                 $vIdentifier = ($valueIdentifier) ? "{$valueIdentifier}[{$k}]" : $k;
-                $result[$k] = $this->filter($v, $vIdentifier);
+                $result[$k] = $this->filter($v, (string) $vIdentifier);
             }
             return $result;
         } else {
@@ -98,5 +89,5 @@ abstract class AbstractFilter
         }
     }
 
-    abstract public function filterSingle($value, $valueIdentifier = null);
+    abstract public function filterSingle($value, string $valueIdentifier = null);
 }

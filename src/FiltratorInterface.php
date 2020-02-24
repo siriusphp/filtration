@@ -9,5 +9,5 @@ interface FiltratorInterface
 
     public function remove($selector, $callbackOrName = true);
 
-    public function filter($data = array());
+    public function filter(array $data = []);
 }

@@ -14,12 +14,12 @@ class StringTrim extends AbstractFilter
 
     const VALUE_SIDE_BOTH = 'both';
 
-    protected $options = array(
+    protected $options = [
         self::OPTION_SIDE => self::VALUE_SIDE_BOTH,
         self::OPTION_CHARACTERS => " \n\r\t"
-    );
+    ];
 
-    public function filterSingle($value, $valueIdentifier = null)
+    public function filterSingle($value, string $valueIdentifier = null)
     {
         // not a string, move along
         if (! is_string($value)) {

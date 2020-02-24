@@ -8,12 +8,12 @@ class NormalizeDate extends AbstractFilter
 
     const OPTION_OUTPUT_FORMAT = 'output_format';
 
-    protected $options = array(
+    protected $options = [
         self::OPTION_INPUT_FORMAT => 'd/m/Y',
         self::OPTION_OUTPUT_FORMAT => 'Y-m-d'
-    );
+    ];
 
-    public function filterSingle($value, $valueIdentifier = null)
+    public function filterSingle($value, string $valueIdentifier = null)
     {
         $value = (string) $value;
         $timestamp = $this->parseDateFromString($value, $this->options['input_format']);

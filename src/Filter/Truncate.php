@@ -10,13 +10,13 @@ class Truncate extends AbstractFilter
 
     const OPTION_BREAK_WORDS = 'break_words';
 
-    protected $options = array(
+    protected $options = [
         self::OPTION_LIMIT => false,
         self::OPTION_BREAK_WORDS => true,
         self::OPTION_ELLIPSIS => '...'
-    );
+    ];
 
-    public function filterSingle($value, $valueIdentifier = null)
+    public function filterSingle($value, string $valueIdentifier = null)
     {
         // not a string, move along
         if (! is_string($value)) {

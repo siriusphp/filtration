@@ -6,11 +6,11 @@ class Double extends AbstractFilter
 {
     const OPTION_PRECISION = 'precision';
 
-    protected $options = array(
+    protected $options = [
         self::OPTION_PRECISION => 2
-    );
+    ];
 
-    public function filterSingle($value, $valueIdentifier = null)
+    public function filterSingle($value, string $valueIdentifier = null)
     {
         if (is_object($value)) {
             return $value;

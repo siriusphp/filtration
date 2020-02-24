@@ -108,14 +108,6 @@ class FiltratorTest extends TestCase
         )));
     }
 
-    function testDuplicateCallbacksNotAllowed()
-    {
-        $this->filtrator->add('*', 'StringTrim', null, true);
-        $this->filtrator->add('*', 'StringTrim', null, true);
-
-        $this->assertEquals(1, count($this->filtrator->getFilters()['*']));
-    }
-
     function testExceptionThrownForUncallableFilters()
     {
         $this->expectException('\InvalidArgumentException');
@@ -163,13 +155,6 @@ class FiltratorTest extends TestCase
     {
         $this->expectException('\InvalidArgumentException');
         $this->filtrator->add('trim', new \stdClass());
-    }
-
-    function testFilteringNonArrays()
-    {
-        $obj      = new \stdClass();
-        $obj->key = 'value';
-        $this->assertEquals($obj, $this->filtrator->filter($obj));
     }
 
     function testRemovingAllFiltersForASelector()
