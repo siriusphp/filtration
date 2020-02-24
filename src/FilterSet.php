@@ -87,6 +87,9 @@ class FilterSet extends \SplPriorityQueue
     public function applyFilters($value, $valueIdentifier = null, $context = null)
     {
         foreach (clone $this as $filter) {
+            if (is_array($filter)) {
+                $filter = $filter['data'];
+            }
             /* @var $filter AbstractFilterAlias */
             $filter->setContext($context);
             $value = $filter->filter($value, (string) $valueIdentifier);
